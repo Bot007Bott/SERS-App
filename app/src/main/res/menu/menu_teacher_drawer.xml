@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/teacherDashboardFragment"
+        android:icon="@drawable/dashboard"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/teacherCoursesFragment"
+        android:icon="@drawable/course"
+        android:title="My Courses" />
+
+    <item
+        android:id="@+id/teacherGradesFragment"
+        android:icon="@drawable/grade"
+        android:title="Grades" />
+
+    <item
+        android:id="@+id/teacherAttendanceFragment"
+        android:icon="@drawable/attendance"
+        android:title="Attendance" />
+
+    <item
+        android:id="@+id/teacherAnalyticsFragment"
+        android:icon="@drawable/analytics"
+        android:title="Analytics" />
+
+    <item
+        android:id="@+id/teacherReportFragment"
+        android:icon="@drawable/ic_report"
+        android:title="Report" />
+
+    <item
+        android:id="@+id/teacherProfileFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Profile"/>
+
+    <item
+        android:id="@+id/teacherSettingsFragment"
+        android:icon="@drawable/ic_setting"
+        android:title="Settings" />
+
+</menu>

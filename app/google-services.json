@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79221511386",
+    "project_id": "sers-b1bff",
+    "storage_bucket": "sers-b1bff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79221511386:android:ec429ff8dcfa45160681e3",
+        "android_client_info": {
+          "package_name": "com.sers.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGiF9h_Bd8tkVfWxM6d0XKdRKFifkMwYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_admin"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.sers.app.ui.admin.DashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/userManagementFragment"
+        android:name="com.sers.app.ui.admin.UserManagementFragment"
+        android:label="User Management" />
+
+    <fragment
+        android:id="@+id/studentManagementFragment"
+        android:name="com.sers.app.ui.admin.StudentManagementFragment"
+        android:label="Student Management" />
+
+    <fragment
+        android:id="@+id/teacherManagementFragment"
+        android:name="com.sers.app.ui.admin.TeacherManagementFragment"
+        android:label="Teacher Management" />
+
+    <fragment
+        android:id="@+id/enrollmentFragment"
+        android:name="com.sers.app.ui.admin.EnrollmentFragment"
+        android:label="Enrollment" />
+
+    <fragment
+        android:id="@+id/coursesFragment"
+        android:name="com.sers.app.ui.admin.CoursesFragment"
+        android:label="Courses" />
+
+    <fragment
+        android:id="@+id/gradesFragment"
+        android:name="com.sers.app.ui.admin.GradesFragment"
+        android:label="Grades" />
+
+    <fragment
+        android:id="@+id/attendanceFragment"
+        android:name="com.sers.app.ui.admin.AttendanceFragment"
+        android:label="Attendance" />
+
+    <fragment
+        android:id="@+id/analyticsFragment"
+        android:name="com.sers.app.ui.admin.AnalyticsFragment"
+        android:label="Analytics" />
+
+    <fragment
+        android:id="@+id/adminSettingsFragment"
+        android:name="com.sers.app.ui.admin.AdminSettingsFragment"
+        android:label="Settings" />
+
+    <fragment
+        android:id="@+id/adminReportFragment"
+        android:name="com.sers.app.ui.admin.AdminReportFragment"
+        android:label="Report" />
+
+    <fragment
+        android:id="@+id/adminProfileFragment"
+        android:name="com.sers.app.ui.admin.AdminProfileFragment"
+        android:label="Profile"/>
+
+</navigation>

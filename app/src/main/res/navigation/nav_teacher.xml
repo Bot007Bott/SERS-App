@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_teacher"
+    app:startDestination="@id/teacherDashboardFragment">
+
+    <fragment
+        android:id="@+id/teacherDashboardFragment"
+        android:name="com.sers.app.ui.teacher.TeacherDashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/teacherCoursesFragment"
+        android:name="com.sers.app.ui.teacher.TeacherCoursesFragment"
+        android:label="My Courses" />
+
+    <fragment
+        android:id="@+id/teacherCourseDetailFragment"
+        android:name="com.sers.app.ui.teacher.TeacherCourseDetailFragment"
+        android:label="Course Detail">
+        <argument
+            android:name="courseId"
+            app:argType="string"/>
+        <argument
+            android:name="courseName"
+            app:argType="string"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/teacherGradesFragment"
+        android:name="com.sers.app.ui.teacher.TeacherGradesFragment"
+        android:label="Grades" />
+
+    <fragment
+        android:id="@+id/teacherAttendanceFragment"
+        android:name="com.sers.app.ui.teacher.TeacherAttendanceFragment"
+        android:label="Attendance" />
+
+    <fragment
+        android:id="@+id/teacherAnalyticsFragment"
+        android:name="com.sers.app.ui.teacher.TeacherAnalyticsFragment"
+        android:label="Analytics" />
+
+    <fragment
+        android:id="@+id/teacherSettingsFragment"
+        android:name="com.sers.app.ui.teacher.TeacherSettingsFragment"
+        android:label="Settings" />
+
+    <fragment
+        android:id="@+id/teacherReportFragment"
+        android:name="com.sers.app.ui.teacher.TeacherReportFragment"
+        android:label="Report" />
+
+    <fragment
+        android:id="@+id/teacherProfileFragment"
+        android:name="com.sers.app.ui.teacher.TeacherProfileFragment"
+        android:label="Profile"/>
+
+</navigation>

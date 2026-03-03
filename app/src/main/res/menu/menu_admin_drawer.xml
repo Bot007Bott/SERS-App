@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dashboardFragment"
+        android:icon="@drawable/dashboard"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/userManagementFragment"
+        android:icon="@drawable/usermanagement"
+        android:title="User Management" />
+
+    <item
+        android:id="@+id/studentManagementFragment"
+        android:icon="@drawable/studentmanagement"
+        android:title="Student Management" />
+
+    <item
+        android:id="@+id/teacherManagementFragment"
+        android:icon="@drawable/ic_teacher_management"
+        android:title="Teacher Management" />
+
+    <item
+        android:id="@+id/enrollmentFragment"
+        android:icon="@drawable/ic_enrollment"
+        android:title="Enrollment" />
+
+    <item
+        android:id="@+id/coursesFragment"
+        android:icon="@drawable/course"
+        android:title="Courses" />
+
+    <item
+        android:id="@+id/gradesFragment"
+        android:icon="@drawable/grade"
+        android:title="Grades" />
+
+    <item
+        android:id="@+id/attendanceFragment"
+        android:icon="@drawable/attendance"
+        android:title="Attendance" />
+
+    <item
+        android:id="@+id/analyticsFragment"
+        android:icon="@drawable/analytics"
+        android:title="Analytics" />
+
+    <item
+        android:id="@+id/adminReportFragment"
+        android:icon="@drawable/ic_report"
+        android:title="Report" />
+
+    <item
+        android:id="@+id/adminSettingsFragment"
+        android:icon="@drawable/ic_setting"
+        android:title="Settings" />
+
+    <item
+        android:id="@+id/adminProfileFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Profile"/>
+
+</menu>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_student"
+    app:startDestination="@id/studentDashboardFragment">
+
+    <fragment
+        android:id="@+id/studentDashboardFragment"
+        android:name="com.sers.app.ui.student.StudentDashboardFragment"
+        android:label="Dashboard"/>
+
+    <fragment
+        android:id="@+id/studentGradesFragment"
+        android:name="com.sers.app.ui.student.StudentGradesFragment"
+        android:label="My Grades"/>
+
+    <fragment
+        android:id="@+id/studentAttendanceFragment"
+        android:name="com.sers.app.ui.student.StudentAttendanceFragment"
+        android:label="My Attendance"/>
+
+    <fragment
+        android:id="@+id/studentProfileFragment"
+        android:name="com.sers.app.ui.student.StudentProfileFragment"
+        android:label="Profile"/>
+
+    <fragment
+        android:id="@+id/studentSettingsFragment"
+        android:name="com.sers.app.ui.student.StudentSettingsFragment"
+        android:label="Settings" />
+
+    <fragment
+        android:id="@+id/studentReportFragment"
+        android:name="com.sers.app.ui.student.StudentReportFragment"
+        android:label="Report" />
+
+</navigation>

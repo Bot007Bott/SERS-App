@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Course Title -->
+    <TextView
+        android:id="@+id/tvCourseTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Course Name"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvCourseCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CS101"
+        android:textSize="13sp"
+        android:textColor="#757575"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvStudentCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 students enrolled"
+        android:textSize="13sp"
+        android:textColor="#43A047"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Enroll Student Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEnrollStudent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enroll Student"
+        android:layout_marginBottom="16dp"
+        app:backgroundTint="#1976D2"
+        app:cornerRadius="8dp"/>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Enrolled Students List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEnrolledStudents"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:clipToPadding="false"/>
+
+</LinearLayout>
