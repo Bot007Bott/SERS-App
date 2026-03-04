@@ -182,10 +182,30 @@ class TeacherGradesFragment : Fragment() {
         }
 
         v.findViewById<MaterialButton>(R.id.btnSave).setOnClickListener {
-            val score = etScore.text.toString().toIntOrNull() ?: 0
-            val total = etTotal.text.toString().toIntOrNull() ?: 100
-            val type = actvType.text.toString(); val title = etTitle.text.toString()
-            if (sId.isEmpty() || cId.isEmpty() || type.isEmpty()) return@setOnClickListener
+            val scoreStr = etScore.text.toString().trim()
+            val totalStr = etTotal.text.toString().trim()
+            val type = actvType.text.toString().trim()
+            val title = etTitle.text.toString().trim()
+            if (sId.isEmpty() || cId.isEmpty()) {
+                Snackbar.make(binding.root, "Please select a student and course", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (type.isEmpty()) {
+                Snackbar.make(binding.root, "Please select a grade type", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (scoreStr.isEmpty()) {
+                Snackbar.make(binding.root, "Please enter a score", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            val score = scoreStr.toIntOrNull()
+            val total = totalStr.toIntOrNull()
+            if (score == null || score < 0) {
+                Snackbar.make(binding.root, "Score must be a valid positive number", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (total == null || total <= 0) {
+                Snackbar.make(binding.root, "Total marks must be greater than zero", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (score > total) {
+                Snackbar.make(binding.root, "Score cannot be greater than total marks", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
             val data = mapOf("studentId" to sId, "courseId" to cId, "score" to score, "totalMarks" to total, "gradeType" to type, "title" to title)
             viewModel.saveGrade(grade?.docId, data); dialog.dismiss()
         }

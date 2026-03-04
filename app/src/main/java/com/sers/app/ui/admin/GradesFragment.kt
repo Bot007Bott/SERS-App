@@ -60,7 +60,7 @@ class GradesFragment : Fragment() {
 
         binding.btnFilter.setOnClickListener { showFilterSheet() }
         binding.btnAddGrade.setOnClickListener { showGradeDialog(null) }
-        
+
         viewModel.loadAllData()
     }
 
@@ -198,8 +198,20 @@ class GradesFragment : Fragment() {
 
         dialogView.findViewById<MaterialButton>(R.id.btnSave).setOnClickListener {
             val sStr = etScore.text.toString().trim(); val tStr = etTotal.text.toString().trim(); val type = actvType.text.toString().trim(); val title = etTitle.text.toString().trim()
-            if (selectedStudentId.isEmpty() || selectedCourseId.isEmpty() || sStr.isEmpty() || type.isEmpty()) { Snackbar.make(binding.root, "Required fields missing!", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
-            val score = sStr.toIntOrNull() ?: 0; val total = tStr.toIntOrNull() ?: 100
+            if (selectedStudentId.isEmpty() || selectedCourseId.isEmpty() || sStr.isEmpty() || type.isEmpty()) {
+                Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            val score = sStr.toIntOrNull()
+            val total = tStr.toIntOrNull()
+            if (score == null || score < 0) {
+                Snackbar.make(binding.root, "Score must be a valid positive number", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (total == null || total <= 0) {
+                Snackbar.make(binding.root, "Total marks must be greater than zero", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (score > total) {
+                Snackbar.make(binding.root, "Score cannot be greater than total marks", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
             if (isEdit) viewModel.updateGrade(grade!!.docId, selectedStudentId, selectedCourseId, type, title, score, total)
             else viewModel.addGrade(selectedStudentId, selectedCourseId, type, title, score, total)
             dialog.dismiss()

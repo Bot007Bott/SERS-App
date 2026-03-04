@@ -13,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.sers.app.R
 import com.sers.app.databinding.FragmentSettingsBinding
+import com.sers.app.utils.ThemeHelper
 import com.sers.app.viewmodel.ProfileViewModel
 
 /**
@@ -66,12 +67,26 @@ class TeacherSettingsFragment : Fragment() {
 
         viewModel.loadCurrentUser()
 
+        // Dark mode toggle
+        binding.switchDarkMode.isChecked = ThemeHelper.isDarkModeEnabled(requireContext())
+        binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+            ThemeHelper.setDarkMode(requireContext(), isChecked)
+        }
+
         binding.btnChangePhoto.setOnClickListener { pickImage.launch("image/*") }
         binding.btnSaveInfo.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val phone = binding.etPhone.text.toString().trim()
             if (email.isEmpty()) {
-                Snackbar.make(binding.root, "Please fill in email", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Email is required", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Snackbar.make(binding.root, "Please enter a valid email address", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (phone.isNotEmpty() && !phone.matches(Regex("^[+]?[0-9]{7,15}$"))) {
+                Snackbar.make(binding.root, "Please enter a valid phone number", Snackbar.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             viewModel.saveInfo(userDocId, email, phone)

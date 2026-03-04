@@ -52,7 +52,7 @@ class StudentManagementFragment : Fragment() {
         setupSort()
 
         binding.btnAddStudent.setOnClickListener { showStudentDialog(null) }
-        
+
         viewModel.loadStudents()
     }
 
@@ -125,11 +125,11 @@ class StudentManagementFragment : Fragment() {
     private fun refreshList() {
         val query = binding.etSearch.text.toString().lowercase()
         val allStudents = viewModel.students.value ?: emptyList()
-        
+
         var list = allStudents.filter {
             it.firstName.contains(query, ignoreCase = true) ||
-            it.lastName.contains(query, ignoreCase = true) ||
-            it.email.contains(query, ignoreCase = true)
+                    it.lastName.contains(query, ignoreCase = true) ||
+                    it.email.contains(query, ignoreCase = true)
         }
 
         list = when (currentSortOrder) {
@@ -180,6 +180,12 @@ class StudentManagementFragment : Fragment() {
 
             if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
                 Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Snackbar.make(binding.root, "Please enter a valid email address", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (phone.isNotEmpty() && !phone.matches(Regex("^[+]?[0-9]{7,15}$"))) {
+                Snackbar.make(binding.root, "Please enter a valid phone number", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
             }
 
             if (isEdit) {

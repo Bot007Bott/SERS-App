@@ -52,7 +52,7 @@ class TeacherManagementFragment : Fragment() {
         setupSort()
 
         binding.btnAddTeacher.setOnClickListener { showTeacherDialog(null) }
-        
+
         viewModel.loadTeachers()
     }
 
@@ -125,12 +125,12 @@ class TeacherManagementFragment : Fragment() {
     private fun refreshList() {
         val query = binding.etSearch.text.toString().lowercase()
         val allTeachers = viewModel.teachers.value ?: emptyList()
-        
+
         var list = allTeachers.filter {
             it.firstName.contains(query, ignoreCase = true) ||
-            it.lastName.contains(query, ignoreCase = true) ||
-            it.email.contains(query, ignoreCase = true) ||
-            it.department.contains(query, ignoreCase = true)
+                    it.lastName.contains(query, ignoreCase = true) ||
+                    it.email.contains(query, ignoreCase = true) ||
+                    it.department.contains(query, ignoreCase = true)
         }
 
         list = when (currentSortOrder) {
@@ -183,6 +183,12 @@ class TeacherManagementFragment : Fragment() {
 
             if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
                 Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Snackbar.make(binding.root, "Please enter a valid email address", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (phone.isNotEmpty() && !phone.matches(Regex("^[+]?[0-9]{7,15}$"))) {
+                Snackbar.make(binding.root, "Please enter a valid phone number", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
             }
 
             if (isEdit) {

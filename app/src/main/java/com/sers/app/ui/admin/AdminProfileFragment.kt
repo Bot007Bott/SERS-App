@@ -32,7 +32,7 @@ class AdminProfileFragment : Fragment() {
             binding.tvRole.text = "Administrator"
             binding.tvAvatar.text = user.firstName.firstOrNull()?.uppercase() ?: "A"
             binding.tvEmail.text = user.email
-            binding.tvPhone.text = "Not set"
+            binding.tvPhone.text = user.phone.ifEmpty { "Not set" }
             binding.tvRoleInfo.text = "Administrator"
         }
 

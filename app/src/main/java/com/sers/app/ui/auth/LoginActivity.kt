@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.sers.app.utils.ThemeHelper
 import com.google.android.material.snackbar.Snackbar
 import com.sers.app.databinding.ActivityLoginBinding
 import com.sers.app.ui.admin.AdminMainActivity
@@ -23,6 +24,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeHelper.applySavedTheme(this)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -49,12 +51,18 @@ class LoginActivity : AppCompatActivity() {
             if (email.isEmpty()) {
                 binding.tilEmail.error = "Email is required"
                 return@setOnClickListener
+            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.error = "Please enter a valid email address"
+                return@setOnClickListener
             } else {
                 binding.tilEmail.error = null
             }
 
             if (password.isEmpty()) {
                 binding.tilPassword.error = "Password is required"
+                return@setOnClickListener
+            } else if (password.length < 6) {
+                binding.tilPassword.error = "Password must be at least 6 characters"
                 return@setOnClickListener
             } else {
                 binding.tilPassword.error = null

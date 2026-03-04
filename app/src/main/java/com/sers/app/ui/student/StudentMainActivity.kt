@@ -2,6 +2,7 @@ package com.sers.app.ui.student
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.sers.app.utils.ThemeHelper
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -22,6 +23,7 @@ class StudentMainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeHelper.applySavedTheme(this)
         binding = ActivityStudentMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
