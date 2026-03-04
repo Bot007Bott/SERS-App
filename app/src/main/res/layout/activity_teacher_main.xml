@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#1976D2"
+            android:background="?attr/colorPrimary"
             app:titleTextColor="#FFFFFF"
             app:navigationIconTint="#FFFFFF"
             app:title="Dashboard" />
@@ -36,7 +36,7 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurface"
         android:orientation="vertical">
 
         <com.google.android.material.navigation.NavigationView

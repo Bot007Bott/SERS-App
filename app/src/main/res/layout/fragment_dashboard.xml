@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:text="Welcome back, Admin!"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:text="What would you like to manage today?"
             android:textSize="14sp"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
         <!-- Stats Row -->
@@ -54,7 +54,7 @@
                         android:layout_height="wrap_content"
                         android:text="Total Users"
                         android:textSize="11sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvTotalUsers"
                         android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
                         android:text="0"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="#1976D2"/>
+                        android:textColor="?attr/colorPrimary"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -84,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:text="Students"
                         android:textSize="11sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvTotalStudents"
                         android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
                         android:text="0"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="#1976D2"/>
+                        android:textColor="?attr/colorPrimary"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -114,7 +114,7 @@
                         android:layout_height="wrap_content"
                         android:text="Courses"
                         android:textSize="11sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvTotalCourses"
                         android:layout_width="wrap_content"
@@ -122,7 +122,7 @@
                         android:text="0"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="#1976D2"/>
+                        android:textColor="?attr/colorPrimary"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -144,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:text="Teachers"
                         android:textSize="11sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvTotalTeachers"
                         android:layout_width="wrap_content"
@@ -152,7 +152,7 @@
                         android:text="0"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="#1976D2"/>
+                        android:textColor="?attr/colorPrimary"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -165,7 +165,7 @@
             android:text="Quick Access"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="12dp"/>
 
         <!-- Row 1 -->
@@ -197,7 +197,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:src="@drawable/usermanagement"
-                        app:tint="#1976D2"
+                        app:tint="?attr/colorPrimary"
                         android:layout_marginBottom="8dp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -205,7 +205,7 @@
                         android:text="User Management"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -232,7 +232,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:src="@drawable/studentmanagement"
-                        app:tint="#1976D2"
+                        app:tint="?attr/colorPrimary"
                         android:layout_marginBottom="8dp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -240,7 +240,7 @@
                         android:text="Student Management"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -284,7 +284,7 @@
                         android:text="Courses"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -319,7 +319,7 @@
                         android:text="Grades"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -363,7 +363,7 @@
                         android:text="Attendance"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -398,7 +398,7 @@
                         android:text="Analytics"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -442,7 +442,7 @@
                         android:text="Teacher Management"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -477,7 +477,7 @@
                         android:text="Enrollment"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -518,7 +518,7 @@
                         android:text="Reports"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -542,7 +542,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:src="@drawable/ic_setting"
-                        app:tint="#546E7A"
+                        app:tint="?android:textColorSecondary"
                         android:layout_marginBottom="8dp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -550,7 +550,7 @@
                         android:text="Settings"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:gravity="center"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -12,14 +12,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="15sp"
-        android:textColor="#000000"/>
+        android:textColor="?android:textColorPrimary"/>
 
     <ImageView
         android:id="@+id/ivCheck"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/ic_check"
-        app:tint="#1976D2"
+        app:tint="?attr/colorPrimary"
         android:visibility="gone"
         xmlns:app="http://schemas.android.com/apk/res-auto"/>
 

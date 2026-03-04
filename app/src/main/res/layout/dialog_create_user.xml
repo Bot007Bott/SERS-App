@@ -17,7 +17,7 @@
             android:id="@+id/tvTitle"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -26,7 +26,7 @@
             android:text="Add a new user account to the system"
             android:id="@+id/tvSubtitle"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
         <!-- First Name -->
@@ -108,7 +108,7 @@
             android:layout_marginBottom="12dp"
             android:text="Link Profile (Optional)"
             android:visibility="gone"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <!-- Password -->
@@ -133,7 +133,7 @@
             android:layout_height="wrap_content"
             android:text="Create User"
             android:layout_marginBottom="8dp"
-            app:backgroundTint="#1976D2"
+            app:backgroundTint="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -142,7 +142,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
     </LinearLayout>

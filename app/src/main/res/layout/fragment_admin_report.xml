@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="?android:colorBackground">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
                 android:text="Report"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="?android:textColorPrimary"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="Generate reports for students and teachers"
                 android:textSize="13sp"
-                android:textColor="#757575"
+                android:textColor="?android:textColorSecondary"
                 android:layout_marginBottom="20dp"/>
 
             <!-- Report Type Selection -->
@@ -54,7 +54,7 @@
                         android:text="Report Type"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:layout_marginBottom="12dp"/>
 
                     <LinearLayout
@@ -70,8 +70,8 @@
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
                             android:text="Student Report"
-                            android:textColor="#1976D2"
-                            app:strokeColor="#1976D2"
+                            android:textColor="?attr/colorPrimary"
+                            app:strokeColor="?attr/colorPrimary"
                             app:cornerRadius="8dp"/>
 
                         <com.google.android.material.button.MaterialButton
@@ -81,8 +81,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Teacher Report"
-                            android:textColor="#1976D2"
-                            app:strokeColor="#1976D2"
+                            android:textColor="?attr/colorPrimary"
+                            app:strokeColor="?attr/colorPrimary"
                             app:cornerRadius="8dp"/>
 
                     </LinearLayout>
@@ -117,7 +117,7 @@
                             android:text="Filter"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            android:textColor="#000000"
+                            android:textColor="?android:textColorPrimary"
                             android:layout_marginBottom="12dp"/>
 
                         <com.google.android.material.button.MaterialButton
@@ -127,7 +127,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
                             android:text="Select Student"
-                            app:strokeColor="#1976D2"
+                            app:strokeColor="?attr/colorPrimary"
                             app:cornerRadius="8dp"/>
 
                         <LinearLayout
@@ -143,7 +143,7 @@
                                 android:layout_weight="1"
                                 android:layout_marginEnd="8dp"
                                 android:text="All Months"
-                                app:strokeColor="#1976D2"
+                                app:strokeColor="?attr/colorPrimary"
                                 app:cornerRadius="8dp"/>
 
                             <com.google.android.material.button.MaterialButton
@@ -153,7 +153,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="All Years"
-                                app:strokeColor="#1976D2"
+                                app:strokeColor="?attr/colorPrimary"
                                 app:cornerRadius="8dp"/>
 
                         </LinearLayout>
@@ -189,7 +189,7 @@
                             android:text="Filter"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            android:textColor="#000000"
+                            android:textColor="?android:textColorPrimary"
                             android:layout_marginBottom="12dp"/>
 
                         <com.google.android.material.button.MaterialButton
@@ -199,7 +199,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
                             android:text="Select Teacher"
-                            app:strokeColor="#1976D2"
+                            app:strokeColor="?attr/colorPrimary"
                             app:cornerRadius="8dp"/>
 
                         <LinearLayout
@@ -215,7 +215,7 @@
                                 android:layout_weight="1"
                                 android:layout_marginEnd="8dp"
                                 android:text="All Months"
-                                app:strokeColor="#1976D2"
+                                app:strokeColor="?attr/colorPrimary"
                                 app:cornerRadius="8dp"/>
 
                             <com.google.android.material.button.MaterialButton
@@ -225,7 +225,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="All Years"
-                                app:strokeColor="#1976D2"
+                                app:strokeColor="?attr/colorPrimary"
                                 app:cornerRadius="8dp"/>
 
                         </LinearLayout>
@@ -240,7 +240,7 @@
                 android:layout_height="wrap_content"
                 android:text="Generate Report"
                 android:layout_marginBottom="16dp"
-                app:backgroundTint="#1976D2"
+                app:backgroundTint="?attr/colorPrimary"
                 app:cornerRadius="8dp"/>
 
             <ProgressBar
@@ -273,7 +273,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:layout_marginBottom="4dp"/>
 
                     <TextView
@@ -281,13 +281,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="12sp"
-                        android:textColor="#757575"
+                        android:textColor="?android:textColorSecondary"
                         android:layout_marginBottom="12dp"/>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#E0E0E0"
+                        android:background="?attr/colorSurfaceVariant"
                         android:layout_marginBottom="12dp"/>
 
                     <TextView
@@ -295,7 +295,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="12sp"
-                        android:textColor="#000000"
+                        android:textColor="?android:textColorPrimary"
                         android:fontFamily="monospace"/>
 
                 </LinearLayout>

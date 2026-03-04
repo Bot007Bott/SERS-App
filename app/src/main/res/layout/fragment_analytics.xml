@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:text="Analytics Dashboard"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="Student performance insights and trends"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
         <!-- Summary Cards -->
@@ -54,7 +54,7 @@
                         android:layout_height="wrap_content"
                         android:text="Total Grades"
                         android:textSize="11sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvTotalGrades"
                         android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
                         android:text="0"
                         android:textSize="28sp"
                         android:textStyle="bold"
-                        android:textColor="#1976D2"/>
+                        android:textColor="?attr/colorPrimary"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -85,7 +85,7 @@
                         android:layout_height="wrap_content"
                         android:text="Avg Performance"
                         android:textSize="11sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvAvgPerformance"
                         android:layout_width="wrap_content"
@@ -121,7 +121,7 @@
                     android:text="Grade Distribution"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
@@ -129,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:text="Performance levels breakdown"
                     android:textSize="12sp"
-                    android:textColor="#757575"
+                    android:textColor="?android:textColorSecondary"
                     android:layout_marginBottom="12dp"/>
 
                 <com.github.mikephil.charting.charts.PieChart
@@ -162,7 +162,7 @@
                     android:text="Attendance Status"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
@@ -170,7 +170,7 @@
                     android:layout_height="wrap_content"
                     android:text="Attendance breakdown by status"
                     android:textSize="12sp"
-                    android:textColor="#757575"
+                    android:textColor="?android:textColorSecondary"
                     android:layout_marginBottom="12dp"/>
 
                 <com.github.mikephil.charting.charts.PieChart
@@ -203,7 +203,7 @@
                     android:text="Attendance Trend"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
@@ -211,7 +211,7 @@
                     android:layout_height="wrap_content"
                     android:text="Daily attendance over time"
                     android:textSize="12sp"
-                    android:textColor="#757575"
+                    android:textColor="?android:textColorSecondary"
                     android:layout_marginBottom="12dp"/>
 
                 <com.github.mikephil.charting.charts.LineChart
@@ -243,7 +243,7 @@
                     android:text="Summary Statistics"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="12dp"/>
 
                 <LinearLayout
@@ -257,7 +257,7 @@
                         android:layout_weight="1"
                         android:text="Total Grades Recorded"
                         android:textSize="14sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvSummaryGrades"
                         android:layout_width="wrap_content"
@@ -265,7 +265,7 @@
                         android:text="0"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"/>
+                        android:textColor="?android:textColorPrimary"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -279,7 +279,7 @@
                         android:layout_weight="1"
                         android:text="Average Performance"
                         android:textSize="14sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvSummaryAvg"
                         android:layout_width="wrap_content"
@@ -300,7 +300,7 @@
                         android:layout_weight="1"
                         android:text="Attendance Rate"
                         android:textSize="14sp"
-                        android:textColor="#757575"/>
+                        android:textColor="?android:textColorSecondary"/>
                     <TextView
                         android:id="@+id/tvSummaryAttendance"
                         android:layout_width="wrap_content"
@@ -308,7 +308,7 @@
                         android:text="0%"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="#1976D2"/>
+                        android:textColor="?attr/colorPrimary"/>
                 </LinearLayout>
 
             </LinearLayout>

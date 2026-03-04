@@ -17,7 +17,7 @@
             android:text="Mark Attendance"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:text="Enter attendance information below"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="Select Student"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="Select Course"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -56,7 +56,7 @@
             android:text="Makeup Class"
             android:layout_marginBottom="12dp"
             android:textSize="14sp"
-            android:textColor="#757575"/>
+            android:textColor="?android:textColorSecondary"/>
 
         <!-- Session (auto filled from course) -->
         <com.google.android.material.textfield.TextInputLayout
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:focusable="false"
                 android:inputType="none"
-                android:textColor="#1976D2"/>
+                android:textColor="?attr/colorPrimary"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Makeup pickers (visible only when Makeup checked) -->
@@ -160,7 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="Select Status"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <AutoCompleteTextView
@@ -181,7 +181,7 @@
             android:layout_height="wrap_content"
             android:text="Save"
             android:layout_marginBottom="8dp"
-            app:backgroundTint="#1976D2"
+            app:backgroundTint="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -190,7 +190,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
     </LinearLayout>

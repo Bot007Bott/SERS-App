@@ -29,7 +29,7 @@ class TeacherAnalyticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         setupObservers()
         viewModel.loadData()
     }
@@ -64,7 +64,13 @@ class TeacherAnalyticsFragment : Fragment() {
         if (n > 0) entries.add(PieEntry(n.toFloat(), "Needs Work"))
         if (entries.isEmpty()) return
         val ds = PieDataSet(entries, "").apply { colors = listOf(Color.parseColor("#43A047"), Color.parseColor("#1976D2"), Color.parseColor("#E53935")); valueTextColor = Color.WHITE; valueTextSize = 12f }
-        binding.pieChart.apply { data = PieData(ds); description.isEnabled = false; isDrawHoleEnabled = true; animateY(1000); invalidate() }
+        binding.pieChart.let { chart ->
+            chart.data = PieData(ds)
+            chart.description.isEnabled = false
+            chart.isDrawHoleEnabled = true
+            chart.animateY(1000)
+            chart.invalidate()
+        }
     }
 
     private fun setupAttendancePieChart(p: Int, a: Int, l: Int) {
@@ -74,6 +80,12 @@ class TeacherAnalyticsFragment : Fragment() {
         if (l > 0) entries.add(PieEntry(l.toFloat(), "Late"))
         if (entries.isEmpty()) return
         val ds = PieDataSet(entries, "").apply { colors = listOf(Color.parseColor("#43A047"), Color.parseColor("#E53935"), Color.parseColor("#FB8C00")); valueTextColor = Color.WHITE; valueTextSize = 12f }
-        binding.pieChartAttendance.apply { data = PieData(ds); description.isEnabled = false; isDrawHoleEnabled = true; animateY(1000); invalidate() }
+        binding.pieChartAttendance.let { chart ->
+            chart.data = PieData(ds)
+            chart.description.isEnabled = false
+            chart.isDrawHoleEnabled = true
+            chart.animateY(1000)
+            chart.invalidate()
+        }
     }
 }

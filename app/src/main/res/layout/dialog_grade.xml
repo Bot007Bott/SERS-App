@@ -17,7 +17,7 @@
             android:text="Add Grade"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:text="Enter grade information below"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
         <!-- Select Student Button -->
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="Select Student"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <!-- Select Course Button -->
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="Select Course"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <!-- Grade Type Dropdown -->
@@ -114,7 +114,7 @@
             android:layout_height="wrap_content"
             android:text="Add Grade"
             android:layout_marginBottom="8dp"
-            app:backgroundTint="#1976D2"
+            app:backgroundTint="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -123,7 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            app:strokeColor="#1976D2"
+            app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
     </LinearLayout>

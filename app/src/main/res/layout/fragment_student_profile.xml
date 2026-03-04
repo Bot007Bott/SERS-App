@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:text="My Profile"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="Your account information"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
         <!-- Profile Picture Card -->
@@ -76,7 +76,7 @@
                     android:text="Alice Johnson"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:text="STD001"
                     android:textSize="13sp"
-                    android:textColor="#757575"/>
+                    android:textColor="?android:textColorSecondary"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -111,7 +111,7 @@
                     android:text="Personal Information"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="16dp"/>
 
                 <TextView
@@ -119,14 +119,14 @@
                     android:layout_height="wrap_content"
                     android:text="Email"
                     android:textSize="12sp"
-                    android:textColor="#757575"/>
+                    android:textColor="?android:textColorSecondary"/>
                 <TextView
                     android:id="@+id/tvEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="—"
                     android:textSize="15sp"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="16dp"/>
 
                 <TextView
@@ -134,14 +134,14 @@
                     android:layout_height="wrap_content"
                     android:text="Phone"
                     android:textSize="12sp"
-                    android:textColor="#757575"/>
+                    android:textColor="?android:textColorSecondary"/>
                 <TextView
                     android:id="@+id/tvPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="—"
                     android:textSize="15sp"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="16dp"/>
 
                 <TextView
@@ -149,14 +149,14 @@
                     android:layout_height="wrap_content"
                     android:text="Student ID"
                     android:textSize="12sp"
-                    android:textColor="#757575"/>
+                    android:textColor="?android:textColorSecondary"/>
                 <TextView
                     android:id="@+id/tvStudentIdInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="—"
                     android:textSize="15sp"
-                    android:textColor="#000000"/>
+                    android:textColor="?android:textColorPrimary"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -183,7 +183,7 @@
                     android:text="Enrolled in 0 courses"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="?android:textColorPrimary"
                     android:layout_marginBottom="12dp"/>
 
                 <TextView
@@ -191,7 +191,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="#333333"
+                    android:textColor="?android:textColorPrimary"
                     android:lineSpacingExtra="6dp"/>
 
             </LinearLayout>

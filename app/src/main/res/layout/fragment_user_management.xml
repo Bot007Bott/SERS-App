@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="?android:colorBackground">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -26,14 +26,14 @@
                 android:text="User Management"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#000000"/>
+                android:textColor="?android:textColorPrimary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Create and manage user accounts"
                 android:textSize="13sp"
-                android:textColor="#757575"/>
+                android:textColor="?android:textColorSecondary"/>
 
         </LinearLayout>
 
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Create User"
             android:textSize="13sp"
-            app:backgroundTint="#1976D2"
+            app:backgroundTint="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
     </LinearLayout>
@@ -65,10 +65,10 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             app:icon="@drawable/ic_search"
-            app:iconTint="#1976D2"
-            app:strokeColor="#1976D2"
+            app:iconTint="?attr/colorPrimary"
+            app:strokeColor="?attr/colorPrimary"
             android:text="Search"
-            android:textColor="#1976D2"
+            android:textColor="?attr/colorPrimary"
             android:textSize="13sp"
             app:cornerRadius="8dp"/>
 
@@ -80,10 +80,10 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             app:icon="@drawable/ic_filter"
-            app:iconTint="#1976D2"
-            app:strokeColor="#1976D2"
+            app:iconTint="?attr/colorPrimary"
+            app:strokeColor="?attr/colorPrimary"
             android:text="Filter"
-            android:textColor="#1976D2"
+            android:textColor="?attr/colorPrimary"
             android:textSize="13sp"
             app:cornerRadius="8dp"/>
 
@@ -94,10 +94,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_sort"
-            app:iconTint="#1976D2"
-            app:strokeColor="#1976D2"
+            app:iconTint="?attr/colorPrimary"
+            app:strokeColor="?attr/colorPrimary"
             android:text="Sort"
-            android:textColor="#1976D2"
+            android:textColor="?attr/colorPrimary"
             android:textSize="13sp"
             app:cornerRadius="8dp"/>
 
@@ -137,7 +137,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_search"
-            app:tint="#BDBDBD"
+            app:tint="?android:textColorHint"
             android:layout_marginBottom="16dp"/>
 
         <TextView
@@ -147,7 +147,7 @@
             android:text="No results found"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#757575"
+            android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="8dp"/>
 
         <TextView
@@ -156,7 +156,7 @@
             android:layout_height="wrap_content"
             android:text="Try adjusting your search or filters"
             android:textSize="14sp"
-            android:textColor="#BDBDBD"
+            android:textColor="?android:textColorHint"
             android:gravity="center"/>
 
     </LinearLayout>
