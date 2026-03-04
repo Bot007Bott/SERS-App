@@ -10,5 +10,6 @@ data class User(
     val studentId: String = "",
     val teacherId: String = "",
     val uid: String = "",
+    val phone: String = "",
     val docId: String = ""
 )

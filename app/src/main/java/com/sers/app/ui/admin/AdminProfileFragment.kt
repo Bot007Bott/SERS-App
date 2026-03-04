@@ -5,15 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import androidx.fragment.app.viewModels
 import com.sers.app.databinding.FragmentAdminProfileBinding
+import com.sers.app.viewmodel.ProfileViewModel
 
+/**
+ * AdminProfileFragment — MVVM View
+ * Observes ProfileViewModel to display admin profile info.
+ */
 class AdminProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentAdminProfileBinding
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    private val viewModel: ProfileViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAdminProfileBinding.inflate(inflater, container, false)
@@ -22,21 +25,17 @@ class AdminProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val uid = auth.currentUser?.uid ?: return
-        db.collection("users").whereEqualTo("uid", uid).get()
-            .addOnSuccessListener { docs ->
-                if (docs.isEmpty) return@addOnSuccessListener
-                val doc = docs.documents[0]
-                val firstName = doc.getString("firstName") ?: ""
-                val lastName = doc.getString("lastName") ?: ""
-                val email = doc.getString("email") ?: ""
-                val phone = doc.getString("phone") ?: ""
-                binding.tvName.text = "$firstName $lastName"
-                binding.tvRole.text = "Administrator"
-                binding.tvAvatar.text = firstName.firstOrNull()?.uppercase() ?: "A"
-                binding.tvEmail.text = email
-                binding.tvPhone.text = phone.ifEmpty { "Not set" }
-                binding.tvRoleInfo.text = "Administrator"
-            }
+
+        viewModel.user.observe(viewLifecycleOwner) { user ->
+            user ?: return@observe
+            binding.tvName.text = "${user.firstName} ${user.lastName}"
+            binding.tvRole.text = "Administrator"
+            binding.tvAvatar.text = user.firstName.firstOrNull()?.uppercase() ?: "A"
+            binding.tvEmail.text = user.email
+            binding.tvPhone.text = "Not set"
+            binding.tvRoleInfo.text = "Administrator"
+        }
+
+        viewModel.loadCurrentUser()
     }
 }

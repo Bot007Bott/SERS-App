@@ -5,15 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sers.app.R
 import com.sers.app.databinding.FragmentDashboardBinding
+import com.sers.app.viewmodel.DashboardViewModel
 
+/**
+ * DashboardFragment — MVVM View
+ * Observes DashboardViewModel LiveData and updates the UI.
+ * No Firebase or data logic here.
+ */
 class DashboardFragment : Fragment() {
 
     private lateinit var binding: FragmentDashboardBinding
-    private val db = FirebaseFirestore.getInstance()
+    private val viewModel: DashboardViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentDashboardBinding.inflate(inflater, container, false)
@@ -23,8 +29,19 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadStats()
+        // Observe ViewModel LiveData
+        viewModel.userCount.observe(viewLifecycleOwner) { binding.tvTotalUsers.text = it }
+        viewModel.studentCount.observe(viewLifecycleOwner) { binding.tvTotalStudents.text = it }
+        viewModel.courseCount.observe(viewLifecycleOwner) { binding.tvTotalCourses.text = it }
+        viewModel.teacherCount.observe(viewLifecycleOwner) { binding.tvTotalTeachers.text = it }
 
+        // Load data via ViewModel
+        viewModel.loadStats()
+
+        setupNavigation()
+    }
+
+    private fun setupNavigation() {
         binding.cardUserManagement.setOnClickListener { findNavController().navigate(R.id.userManagementFragment) }
         binding.cardStudentManagement.setOnClickListener { findNavController().navigate(R.id.studentManagementFragment) }
         binding.cardCourses.setOnClickListener { findNavController().navigate(R.id.coursesFragment) }
@@ -35,20 +52,5 @@ class DashboardFragment : Fragment() {
         binding.cardEnrollment.setOnClickListener { findNavController().navigate(R.id.enrollmentFragment) }
         binding.cardReport.setOnClickListener { findNavController().navigate(R.id.adminReportFragment) }
         binding.cardSettings.setOnClickListener { findNavController().navigate(R.id.adminSettingsFragment) }
-    }
-
-    private fun loadStats() {
-        db.collection("users").get().addOnSuccessListener { docs ->
-            binding.tvTotalUsers.text = docs.size().toString()
-        }
-        db.collection("students").get().addOnSuccessListener { docs ->
-            binding.tvTotalStudents.text = docs.size().toString()
-        }
-        db.collection("courses").get().addOnSuccessListener { docs ->
-            binding.tvTotalCourses.text = docs.size().toString()
-        }
-        db.collection("teachers").get().addOnSuccessListener { docs ->
-            binding.tvTotalTeachers.text = docs.size().toString()
-        }
     }
 }

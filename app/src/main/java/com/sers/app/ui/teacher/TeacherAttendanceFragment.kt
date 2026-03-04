@@ -8,14 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sers.app.R
 import com.sers.app.databinding.FragmentTeacherAttendanceBinding
 import com.sers.app.model.Attendance
@@ -23,20 +22,23 @@ import com.sers.app.model.Course
 import com.sers.app.model.Enrollment
 import com.sers.app.model.Student
 import com.sers.app.ui.admin.AttendanceAdapter
+import com.sers.app.viewmodel.TeacherAttendanceViewModel
 
+/**
+ * TeacherAttendanceFragment — MVVM View
+ * Observes TeacherAttendanceViewModel for all data. No Firebase code here.
+ */
 class TeacherAttendanceFragment : Fragment() {
 
     private lateinit var binding: FragmentTeacherAttendanceBinding
     private lateinit var adapter: AttendanceAdapter
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    private val viewModel: TeacherAttendanceViewModel by viewModels()
 
     private val attendanceList = mutableListOf<Attendance>()
     private val studentList = mutableListOf<Student>()
     private val courseList = mutableListOf<Course>()
     private val enrollmentList = mutableListOf<Enrollment>()
 
-    private var myTeacherId = ""
     private var currentFilterStudentId = "All"
     private var currentFilterCourseId = "All"
     private var currentFilterStatus = "All"
@@ -59,7 +61,26 @@ class TeacherAttendanceFragment : Fragment() {
         binding.rvAttendance.adapter = adapter
         updateEmptyState(emptyList())
 
-        loadAllData()
+        // Observe ViewModel
+        viewModel.attendance.observe(viewLifecycleOwner) { list ->
+            attendanceList.clear(); attendanceList.addAll(list)
+            updateSummaryCards(); refreshList()
+        }
+        viewModel.students.observe(viewLifecycleOwner) { students ->
+            studentList.clear(); studentList.addAll(students)
+        }
+        viewModel.courses.observe(viewLifecycleOwner) { courses ->
+            courseList.clear(); courseList.addAll(courses)
+        }
+        viewModel.enrollments.observe(viewLifecycleOwner) { enrollments ->
+            enrollmentList.clear(); enrollmentList.addAll(enrollments)
+        }
+        viewModel.message.observe(viewLifecycleOwner) { msg ->
+            val text = if (msg.startsWith("ERROR:")) msg.removePrefix("ERROR:") else msg
+            Snackbar.make(binding.root, text, Snackbar.LENGTH_SHORT).show()
+        }
+
+        viewModel.loadAllData()
 
         binding.btnSearch.setOnClickListener {
             val isVisible = binding.searchLayout.visibility == View.VISIBLE
@@ -74,8 +95,7 @@ class TeacherAttendanceFragment : Fragment() {
                 val filtered = getFilteredSortedList().filter { att ->
                     val student = studentList.find { it.studentId == att.studentId }
                     val course = courseList.find { it.courseId == att.courseId }
-                    query.isEmpty() ||
-                            "${student?.firstName} ${student?.lastName}".lowercase().contains(query) ||
+                    query.isEmpty() || "${student?.firstName} ${student?.lastName}".lowercase().contains(query) ||
                             course?.courseName?.lowercase()?.contains(query) == true
                 }.toMutableList()
                 adapter.updateList(filtered)
@@ -108,101 +128,11 @@ class TeacherAttendanceFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Sort by")
                 .setSingleChoiceItems(sortOptions, sortOptions.indexOf(currentSortOrder)) { dialog, which ->
-                    currentSortOrder = sortOptions[which]
-                    refreshList()
-                    updateSortButton()
-                    dialog.dismiss()
+                    currentSortOrder = sortOptions[which]; refreshList(); updateSortButton(); dialog.dismiss()
                 }.show()
         }
 
         binding.btnMarkAttendance.setOnClickListener { showAttendanceDialog(null) }
-    }
-
-    private fun loadAllData() {
-        binding.progressBar.visibility = View.VISIBLE
-        val uid = auth.currentUser?.uid ?: return
-        db.collection("users").whereEqualTo("uid", uid).get()
-            .addOnSuccessListener { docs ->
-                myTeacherId = docs.documents[0].getString("teacherId") ?: ""
-                loadStudents()
-            }
-    }
-
-    private fun loadStudents() {
-        db.collection("students").get().addOnSuccessListener { studentDocs ->
-            studentList.clear()
-            studentDocs.forEach { doc ->
-                studentList.add(Student(
-                    studentId = doc.getString("studentId") ?: "",
-                    firstName = doc.getString("firstName") ?: "",
-                    lastName = doc.getString("lastName") ?: "",
-                    email = doc.getString("email") ?: "",
-                    program = doc.getString("program") ?: "",
-                    phone = doc.getString("phone") ?: "",
-                    docId = doc.id
-                ))
-            }
-            db.collection("enrollments").get().addOnSuccessListener { enrollDocs ->
-                enrollmentList.clear()
-                enrollDocs.forEach { doc ->
-                    enrollmentList.add(Enrollment(
-                        enrollmentId = doc.getString("enrollmentId") ?: "",
-                        studentId = doc.getString("studentId") ?: "",
-                        courseId = doc.getString("courseId") ?: "",
-                        docId = doc.id
-                    ))
-                }
-                db.collection("courses").whereEqualTo("teacherId", myTeacherId).get()
-                    .addOnSuccessListener { courseDocs ->
-                        courseList.clear()
-                        courseDocs.forEach { doc ->
-                            courseList.add(Course(
-                                courseId = doc.getString("courseId") ?: "",
-                                courseName = doc.getString("courseName") ?: "",
-                                courseCode = doc.getString("courseCode") ?: "",
-                                schedule = doc.getString("schedule") ?: "",
-                                teacherId = doc.getString("teacherId") ?: "",
-                                createdBy = doc.getString("createdBy") ?: "",
-                                docId = doc.id
-                            ))
-                        }
-                        loadAttendance()
-                    }
-            }
-        }
-    }
-
-    private fun loadAttendance() {
-        val myCourseIds = courseList.map { it.courseId }
-        if (myCourseIds.isEmpty()) {
-            binding.progressBar.visibility = View.GONE
-            updateEmptyState(emptyList())
-            return
-        }
-        db.collection("attendance").addSnapshotListener { snapshot, error ->
-            binding.progressBar.visibility = View.GONE
-            if (error != null) {
-                Snackbar.make(binding.root, "Error: ${error.message}", Snackbar.LENGTH_SHORT).show()
-                return@addSnapshotListener
-            }
-            attendanceList.clear()
-            snapshot?.documents?.forEach { doc ->
-                val courseId = doc.getString("courseId") ?: ""
-                if (courseId in myCourseIds) {
-                    attendanceList.add(Attendance(
-                        attendanceId = doc.getString("attendanceId") ?: "",
-                        studentId = doc.getString("studentId") ?: "",
-                        courseId = courseId,
-                        session = doc.getString("timeSlot") ?: "",
-                        date = doc.getString("date") ?: "",
-                        status = doc.getString("status") ?: "",
-                        docId = doc.id
-                    ))
-                }
-            }
-            updateSummaryCards()
-            refreshList()
-        }
     }
 
     private fun refreshList() {
@@ -271,14 +201,8 @@ class TeacherAttendanceFragment : Fragment() {
         actvMakeupDay.setOnItemClickListener { _, _, _, _ -> buildMakeupSession() }
 
         cbMakeup.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                makeupLayout.visibility = View.VISIBLE
-                etSession.setText("")
-            } else {
-                makeupLayout.visibility = View.GONE
-                val course = courseList.find { it.courseId == selectedCourseId }
-                etSession.setText(course?.schedule ?: "")
-            }
+            if (isChecked) { makeupLayout.visibility = View.VISIBLE; etSession.setText("") }
+            else { makeupLayout.visibility = View.GONE; val course = courseList.find { it.courseId == selectedCourseId }; etSession.setText(course?.schedule ?: "") }
         }
 
         etDate.setOnClickListener {
@@ -294,17 +218,13 @@ class TeacherAttendanceFragment : Fragment() {
             btnSelectStudent.text = if (student != null) "${student.firstName} ${student.lastName}" else attendance!!.studentId
             btnSelectCourse.text = course?.courseName ?: attendance!!.courseId
             btnSelectStatus.text = attendance!!.status
-            selectedStudentId = attendance!!.studentId
-            selectedCourseId = attendance!!.courseId
-            selectedStatus = attendance!!.status
-            etDate.setText(attendance!!.date)
-            etSession.setText(attendance!!.session)
+            selectedStudentId = attendance!!.studentId; selectedCourseId = attendance!!.courseId; selectedStatus = attendance!!.status
+            etDate.setText(attendance!!.date); etSession.setText(attendance!!.session)
         }
 
         btnSelectStudent.setOnClickListener {
             val enrolledIds = enrollmentList.filter { e -> courseList.any { it.courseId == e.courseId } }.map { it.studentId }.distinct()
-            val options = studentList.filter { it.studentId in enrolledIds }
-                .map { Pair("${it.firstName} ${it.lastName} (${it.studentId})", it.studentId) }
+            val options = studentList.filter { it.studentId in enrolledIds }.map { Pair("${it.firstName} ${it.lastName} (${it.studentId})", it.studentId) }
             showPickerSheet("Select Student", options) { name, id ->
                 selectedStudentId = id; btnSelectStudent.text = name.substringBefore(" (")
                 selectedCourseId = ""; btnSelectCourse.text = "Select Course"; etSession.setText("")
@@ -312,56 +232,28 @@ class TeacherAttendanceFragment : Fragment() {
         }
 
         btnSelectCourse.setOnClickListener {
-            if (selectedStudentId.isEmpty()) {
-                Snackbar.make(binding.root, "Please select a student first!", Snackbar.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            if (selectedStudentId.isEmpty()) { Snackbar.make(binding.root, "Please select a student first!", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
             val enrolledCourseIds = enrollmentList.filter { it.studentId == selectedStudentId }.map { it.courseId }
             val available = courseList.filter { it.courseId in enrolledCourseIds }
-            if (available.isEmpty()) {
-                Snackbar.make(binding.root, "This student is not enrolled in any of your courses!", Snackbar.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            if (available.isEmpty()) { Snackbar.make(binding.root, "Student is not enrolled in any of your courses!", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
             showPickerSheet("Select Course", available.map { Pair(it.courseName, it.courseId) }) { name, id ->
                 selectedCourseId = id; btnSelectCourse.text = name
-                if (!cbMakeup.isChecked) {
-                    val course = courseList.find { it.courseId == id }
-                    etSession.setText(course?.schedule ?: "")
-                }
+                if (!cbMakeup.isChecked) { val course = courseList.find { it.courseId == id }; etSession.setText(course?.schedule ?: "") }
             }
         }
 
         btnSelectStatus.setOnClickListener {
-            showPickerSheet("Select Status", listOf("Present", "Absent", "Late").map { Pair(it, it) }) { name, id ->
-                selectedStatus = id; btnSelectStatus.text = name
-            }
+            showPickerSheet("Select Status", listOf("Present", "Absent", "Late").map { Pair(it, it) }) { name, id -> selectedStatus = id; btnSelectStatus.text = name }
         }
 
         dialogView.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<MaterialButton>(R.id.btnSave).setOnClickListener {
-            val date = etDate.text.toString().trim()
-            val session = etSession.text.toString().trim()
+            val date = etDate.text.toString().trim(); val session = etSession.text.toString().trim()
             if (selectedStudentId.isEmpty() || selectedCourseId.isEmpty() || selectedStatus.isEmpty() || date.isEmpty()) {
-                Snackbar.make(binding.root, "Please fill in all fields", Snackbar.LENGTH_SHORT).show()
-                return@setOnClickListener
+                Snackbar.make(binding.root, "Please fill in all fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
             }
-            if (isEdit) {
-                db.collection("attendance").document(attendance!!.docId)
-                    .update("studentId", selectedStudentId, "courseId", selectedCourseId, "status", selectedStatus, "date", date, "timeSlot", session)
-                    .addOnSuccessListener { Snackbar.make(binding.root, "Attendance updated!", Snackbar.LENGTH_SHORT).show() }
-                    .addOnFailureListener { e -> Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show() }
-            } else {
-                db.collection("attendance").add(hashMapOf(
-                    "attendanceId" to "A${System.currentTimeMillis()}",
-                    "studentId" to selectedStudentId,
-                    "courseId" to selectedCourseId,
-                    "status" to selectedStatus,
-                    "date" to date,
-                    "timeSlot" to session
-                ))
-                    .addOnSuccessListener { Snackbar.make(binding.root, "Attendance marked!", Snackbar.LENGTH_SHORT).show() }
-                    .addOnFailureListener { e -> Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show() }
-            }
+            if (isEdit) viewModel.updateAttendance(attendance!!.docId, selectedStudentId, selectedCourseId, selectedStatus, date, session)
+            else viewModel.markAttendance(selectedStudentId, selectedCourseId, selectedStatus, date, session)
             dialog.dismiss()
         }
         dialog.show()
@@ -374,12 +266,7 @@ class TeacherAttendanceFragment : Fragment() {
             .setTitle("Delete Record")
             .setMessage("Delete ${student?.firstName} ${student?.lastName}'s ${course?.courseName} attendance?")
             .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
-            .setPositiveButton("Delete") { d, _ ->
-                db.collection("attendance").document(attendance.docId).delete()
-                    .addOnSuccessListener { Snackbar.make(binding.root, "Record deleted!", Snackbar.LENGTH_SHORT).show() }
-                    .addOnFailureListener { e -> Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show() }
-                d.dismiss()
-            }.show()
+            .setPositiveButton("Delete") { d, _ -> viewModel.deleteAttendance(attendance.docId); d.dismiss() }.show()
     }
 
     private fun showPickerFilterSheet(title: String, options: List<Pair<String, String>>, onSelect: (String) -> Unit) {

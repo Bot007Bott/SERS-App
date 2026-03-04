@@ -2,34 +2,45 @@ package com.sers.app.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sers.app.databinding.ActivityLoginBinding
 import com.sers.app.ui.admin.AdminMainActivity
 import com.sers.app.ui.teacher.TeacherMainActivity
 import com.sers.app.ui.student.StudentMainActivity
+import com.sers.app.viewmodel.LoginViewModel
 
+/**
+ * LoginActivity — MVVM View
+ * Observes LoginViewModel.loginResult LiveData.
+ * No Firebase or business logic here.
+ */
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
+        // Observe login results from ViewModel
+        viewModel.loginResult.observe(this) { result ->
+            if (result.startsWith("ERROR:")) {
+                val message = result.removePrefix("ERROR:")
+                binding.btnSignIn.isEnabled = true
+                binding.btnSignIn.text = "Sign In"
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+            } else {
+                // result is the role string
+                navigateByRole(result)
+            }
+        }
 
         // Auto-login if already signed in
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            checkRoleAndNavigate(currentUser.uid)
-        }
+        viewModel.checkCurrentUser()
 
         binding.btnSignIn.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
@@ -49,81 +60,35 @@ class LoginActivity : AppCompatActivity() {
                 binding.tilPassword.error = null
             }
 
-            // Show loading
+            // Show loading state
             binding.btnSignIn.isEnabled = false
             binding.btnSignIn.text = "Signing in..."
 
-            // Step 1: Sign in with Firebase Auth
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener { authResult ->
-                    val uid = authResult.user?.uid ?: return@addOnSuccessListener
-
-                    // Step 2: Check role in Firestore
-                    db.collection("users")
-                        .whereEqualTo("uid", uid)
-                        .get()
-                        .addOnSuccessListener { documents ->
-                            if (documents.isEmpty) {
-                                binding.btnSignIn.isEnabled = true
-                                binding.btnSignIn.text = "Sign In"
-                                Snackbar.make(binding.root, "User data not found!", Snackbar.LENGTH_SHORT).show()
-                                auth.signOut()
-                                return@addOnSuccessListener
-                            }
-
-                            val userDoc = documents.documents[0]
-                            val role = userDoc.getString("role") ?: ""
-
-                            // Step 3: Navigate based on role
-                            when (role) {
-                                "Admin" -> {
-                                    startActivity(Intent(this, AdminMainActivity::class.java))
-                                    finish()
-                                }
-                                "Teacher" -> {
-                                    startActivity(Intent(this, TeacherMainActivity::class.java))
-                                    finish()
-                                }
-                                "Student" -> {
-                                    startActivity(Intent(this, StudentMainActivity::class.java))
-                                    finish()
-                                }
-                                else -> {
-                                    binding.btnSignIn.isEnabled = true
-                                    binding.btnSignIn.text = "Sign In"
-                                    Snackbar.make(binding.root, "Unknown role: $role", Snackbar.LENGTH_SHORT).show()
-                                    auth.signOut()
-                                }
-                            }
-                        }
-                        .addOnFailureListener { e ->
-                            binding.btnSignIn.isEnabled = true
-                            binding.btnSignIn.text = "Sign In"
-                            Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show()
-                            auth.signOut()
-                        }
-                }
-                .addOnFailureListener { e ->
-                    binding.btnSignIn.isEnabled = true
-                    binding.btnSignIn.text = "Sign In"
-                    Snackbar.make(binding.root, "Login failed: ${e.message}", Snackbar.LENGTH_SHORT).show()
-                }
-
+            // Delegate to ViewModel
+            viewModel.login(email, password)
         }
-
     }
-    private fun checkRoleAndNavigate(uid: String) {
-        db.collection("users")
-            .whereEqualTo("uid", uid)
-            .get()
-            .addOnSuccessListener { documents ->
-                if (documents.isEmpty) return@addOnSuccessListener
-                val role = documents.documents[0].getString("role") ?: ""
-                when (role) {
-                    "Admin" -> { startActivity(Intent(this, AdminMainActivity::class.java)); finish() }
-                    "Teacher" -> { startActivity(Intent(this, TeacherMainActivity::class.java)); finish() }
-                    "Student" -> { startActivity(Intent(this, StudentMainActivity::class.java)); finish() }
-                }
+
+    private fun navigateByRole(role: String) {
+        when (role) {
+            "Admin" -> {
+                startActivity(Intent(this, AdminMainActivity::class.java))
+                finish()
             }
+            "Teacher" -> {
+                startActivity(Intent(this, TeacherMainActivity::class.java))
+                finish()
+            }
+            "Student" -> {
+                startActivity(Intent(this, StudentMainActivity::class.java))
+                finish()
+            }
+            else -> {
+                binding.btnSignIn.isEnabled = true
+                binding.btnSignIn.text = "Sign In"
+                Snackbar.make(binding.root, "Unknown role: $role", Snackbar.LENGTH_SHORT).show()
+                viewModel.signOut()
+            }
+        }
     }
 }

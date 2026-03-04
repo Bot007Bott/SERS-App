@@ -8,29 +8,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sers.app.R
 import com.sers.app.databinding.FragmentTeacherManagementBinding
 import com.sers.app.model.Teacher
+import com.sers.app.viewmodel.TeacherManagementViewModel
 
+/**
+ * TeacherManagementFragment — MVVM View
+ * Observes TeacherManagementViewModel and handles UI interactions.
+ */
 class TeacherManagementFragment : Fragment() {
 
     private lateinit var binding: FragmentTeacherManagementBinding
     private lateinit var adapter: TeacherAdapter
-    private val db = FirebaseFirestore.getInstance()
+    private val viewModel: TeacherManagementViewModel by viewModels()
 
-    private val teacherList = mutableListOf<Teacher>()
     private var currentSortOrder = "Default"
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTeacherManagementBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -43,12 +44,32 @@ class TeacherManagementFragment : Fragment() {
             onEditClick = { teacher -> showTeacherDialog(teacher) },
             onDeleteClick = { teacher -> showDeleteDialog(teacher) }
         )
-
         binding.rvTeachers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTeachers.adapter = adapter
 
-        loadTeachers()
+        setupObservers()
+        setupSearch()
+        setupSort()
 
+        binding.btnAddTeacher.setOnClickListener { showTeacherDialog(null) }
+        
+        viewModel.loadTeachers()
+    }
+
+    private fun setupObservers() {
+        viewModel.teachers.observe(viewLifecycleOwner) { teachers ->
+            binding.progressBar.visibility = View.GONE
+            refreshList()
+        }
+
+        viewModel.message.observe(viewLifecycleOwner) { msg ->
+            if (msg.isNotEmpty()) {
+                Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setupSearch() {
         binding.btnSearch.setOnClickListener {
             if (binding.searchLayout.visibility == View.GONE) {
                 binding.searchLayout.visibility = View.VISIBLE
@@ -63,24 +84,14 @@ class TeacherManagementFragment : Fragment() {
                 binding.btnSearch.setTextColor(android.graphics.Color.parseColor("#1976D2"))
                 binding.btnSearch.setIconResource(R.drawable.ic_search)
                 binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
-                val list = getFilteredSortedList()
-                adapter.updateList(list)
-                updateEmptyState(list)
+                refreshList()
             }
         }
 
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s.toString()
-                val filtered = getFilteredSortedList().filter {
-                    it.firstName.contains(query, ignoreCase = true) ||
-                            it.lastName.contains(query, ignoreCase = true) ||
-                            it.email.contains(query, ignoreCase = true) ||
-                            it.department.contains(query, ignoreCase = true)
-                }.toMutableList()
-                adapter.updateList(filtered)
-                updateEmptyState(filtered)
+                refreshList()
             }
             override fun afterTextChanged(s: Editable?) {}
         })
@@ -92,102 +103,67 @@ class TeacherManagementFragment : Fragment() {
             binding.btnSearch.setTextColor(android.graphics.Color.parseColor("#1976D2"))
             binding.btnSearch.setIconResource(R.drawable.ic_search)
             binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
-            val list = getFilteredSortedList()
-            adapter.updateList(list)
-            updateEmptyState(list)
+            refreshList()
         }
+    }
 
+    private fun setupSort() {
         binding.btnSort.setOnClickListener {
             val sortOptions = arrayOf("Default", "Name A-Z", "Name Z-A")
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Sort by")
                 .setSingleChoiceItems(sortOptions, sortOptions.indexOf(currentSortOrder)) { dialog, which ->
                     currentSortOrder = sortOptions[which]
-                    val list = getFilteredSortedList()
-                    adapter.updateList(list)
-                    updateEmptyState(list)
-                    binding.btnSort.text = if (currentSortOrder == "Default") "Sort" else "Sort •"
-                    binding.btnSort.setBackgroundColor(
-                        if (currentSortOrder == "Default") android.graphics.Color.TRANSPARENT
-                        else android.graphics.Color.parseColor("#1976D2"))
-                    binding.btnSort.setTextColor(
-                        if (currentSortOrder == "Default") android.graphics.Color.parseColor("#1976D2")
-                        else android.graphics.Color.WHITE)
-                    binding.btnSort.iconTint = android.content.res.ColorStateList.valueOf(
-                        if (currentSortOrder == "Default") android.graphics.Color.parseColor("#1976D2")
-                        else android.graphics.Color.WHITE)
+                    refreshList()
+                    updateSortButtonUI()
                     dialog.dismiss()
                 }
                 .show()
         }
-
-        binding.btnAddTeacher.setOnClickListener { showTeacherDialog(null) }
     }
 
-    private fun loadTeachers() {
-        binding.progressBar.visibility = View.VISIBLE
-        db.collection("users").get().addOnSuccessListener { userDocs ->
-            // Map teacherId -> userId for cross-referencing
-            val teacherUserMap = mutableMapOf<String, String>()
-            userDocs.forEach { userDoc ->
-                val tid = userDoc.getString("teacherId") ?: ""
-                val uid = userDoc.id
-                if (tid.isNotEmpty()) teacherUserMap[tid] = uid
-            }
-            db.collection("teachers")
-                .addSnapshotListener { snapshot, error ->
-                    binding.progressBar.visibility = View.GONE
-                    if (error != null) {
-                        Snackbar.make(binding.root, "Error: ${error.message}", Snackbar.LENGTH_SHORT).show()
-                        return@addSnapshotListener
-                    }
-                    teacherList.clear()
-                    snapshot?.documents?.forEach { doc ->
-                        val tid = doc.getString("teacherId") ?: ""
-                        teacherList.add(Teacher(
-                            teacherId = tid,
-                            firstName = doc.getString("firstName") ?: "",
-                            lastName = doc.getString("lastName") ?: "",
-                            email = doc.getString("email") ?: "",
-                            department = doc.getString("department") ?: "",
-                            phone = doc.getString("phone") ?: "",
-                            userId = teacherUserMap[tid] ?: "",
-                            docId = doc.id
-                        ))
-                    }
-                    val list = getFilteredSortedList()
-                    adapter.updateList(list)
-                    updateEmptyState(list)
-                }
+    private fun refreshList() {
+        val query = binding.etSearch.text.toString().lowercase()
+        val allTeachers = viewModel.teachers.value ?: emptyList()
+        
+        var list = allTeachers.filter {
+            it.firstName.contains(query, ignoreCase = true) ||
+            it.lastName.contains(query, ignoreCase = true) ||
+            it.email.contains(query, ignoreCase = true) ||
+            it.department.contains(query, ignoreCase = true)
         }
-    }
 
-    private fun getFilteredSortedList(): MutableList<Teacher> {
-        var list = teacherList.toMutableList()
         list = when (currentSortOrder) {
-            "Name A-Z" -> list.sortedBy { it.firstName }.toMutableList()
-            "Name Z-A" -> list.sortedByDescending { it.firstName }.toMutableList()
+            "Name A-Z" -> list.sortedBy { it.firstName }
+            "Name Z-A" -> list.sortedByDescending { it.firstName }
             else -> list
         }
-        return list
+
+        adapter.updateList(list.toMutableList())
+        updateEmptyState(list)
+    }
+
+    private fun updateSortButtonUI() {
+        binding.btnSort.text = if (currentSortOrder == "Default") "Sort" else "Sort •"
+        binding.btnSort.setBackgroundColor(
+            if (currentSortOrder == "Default") android.graphics.Color.TRANSPARENT
+            else android.graphics.Color.parseColor("#1976D2"))
+        binding.btnSort.setTextColor(
+            if (currentSortOrder == "Default") android.graphics.Color.parseColor("#1976D2")
+            else android.graphics.Color.WHITE)
+        binding.btnSort.iconTint = android.content.res.ColorStateList.valueOf(
+            if (currentSortOrder == "Default") android.graphics.Color.parseColor("#1976D2")
+            else android.graphics.Color.WHITE)
     }
 
     private fun showTeacherDialog(teacher: Teacher?) {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_teacher, null)
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogView)
-            .create()
-
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_teacher, null)
+        val dialog = MaterialAlertDialogBuilder(requireContext()).setView(dialogView).create()
         val isEdit = teacher != null
 
-        dialogView.findViewById<TextView>(R.id.tvTitle).text =
-            if (isEdit) "Edit Teacher" else "Add New Teacher"
-        dialogView.findViewById<TextView>(R.id.tvSubtitle).text =
-            if (isEdit) "Update teacher information" else "Fill in the teacher information below"
-        dialogView.findViewById<MaterialButton>(R.id.btnSave).text =
-            if (isEdit) "Update Teacher" else "Add Teacher"
+        dialogView.findViewById<TextView>(R.id.tvTitle).text = if (isEdit) "Edit Teacher" else "Add New Teacher"
+        dialogView.findViewById<TextView>(R.id.tvSubtitle).text = if (isEdit) "Update teacher information" else "Fill in the teacher information below"
+        dialogView.findViewById<MaterialButton>(R.id.btnSave).text = if (isEdit) "Update Teacher" else "Add Teacher"
 
         if (isEdit) {
             dialogView.findViewById<TextInputEditText>(R.id.etFirstName).setText(teacher!!.firstName)
@@ -197,10 +173,7 @@ class TeacherManagementFragment : Fragment() {
             dialogView.findViewById<TextInputEditText>(R.id.etDepartment).setText(teacher.department)
         }
 
-        dialogView.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener {
-            dialog.dismiss()
-        }
-
+        dialogView.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<MaterialButton>(R.id.btnSave).setOnClickListener {
             val firstName = dialogView.findViewById<TextInputEditText>(R.id.etFirstName).text.toString().trim()
             val lastName = dialogView.findViewById<TextInputEditText>(R.id.etLastName).text.toString().trim()
@@ -209,46 +182,18 @@ class TeacherManagementFragment : Fragment() {
             val department = dialogView.findViewById<TextInputEditText>(R.id.etDepartment).text.toString().trim()
 
             if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
-                Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show()
-                return@setOnClickListener
+                Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
             }
 
             if (isEdit) {
-                db.collection("teachers").document(teacher!!.docId)
-                    .update(
-                        "firstName", firstName,
-                        "lastName", lastName,
-                        "email", email,
-                        "phone", phone,
-                        "department", department
-                    )
-                    .addOnSuccessListener {
-                        Snackbar.make(binding.root, "Teacher updated!", Snackbar.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show()
-                    }
+                viewModel.updateTeacher(teacher!!.docId, firstName, lastName, email, phone, department)
             } else {
-                val newId = "TCH${String.format("%03d", teacherList.size + 1)}"
-                val newTeacher = hashMapOf(
-                    "teacherId" to newId,
-                    "firstName" to firstName,
-                    "lastName" to lastName,
-                    "email" to email,
-                    "phone" to phone,
-                    "department" to department
-                )
-                db.collection("teachers").add(newTeacher)
-                    .addOnSuccessListener {
-                        Snackbar.make(binding.root, "Teacher added!", Snackbar.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show()
-                    }
+                val newId = "TCH${String.format("%03d", (viewModel.teachers.value?.size ?: 0) + 1)}"
+                val newTeacher = Teacher(teacherId = newId, firstName = firstName, lastName = lastName, email = email, phone = phone, department = department, docId = "")
+                viewModel.addTeacher(newTeacher)
             }
             dialog.dismiss()
         }
-
         dialog.show()
     }
 
@@ -256,19 +201,11 @@ class TeacherManagementFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Delete Teacher")
             .setMessage("Are you sure you want to delete ${teacher.firstName} ${teacher.lastName}?")
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton("Delete") { dialog, _ ->
-                db.collection("teachers").document(teacher.docId)
-                    .delete()
-                    .addOnSuccessListener {
-                        Snackbar.make(binding.root, "Teacher deleted!", Snackbar.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show()
-                    }
-                dialog.dismiss()
-            }
-            .show()
+            .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
+            .setPositiveButton("Delete") { d, _ ->
+                viewModel.deleteTeacher(teacher.docId)
+                d.dismiss()
+            }.show()
     }
 
     private fun updateEmptyState(list: List<Any>) {

@@ -7,24 +7,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.material.snackbar.Snackbar
 import com.sers.app.R
 import com.sers.app.databinding.FragmentStudentAttendanceBinding
 import com.sers.app.model.Attendance
 import com.sers.app.model.Course
 import com.sers.app.ui.admin.FilterOptionAdapter
+import com.sers.app.viewmodel.StudentAttendanceViewModel
 
+/**
+ * StudentAttendanceFragment — MVVM View
+ * Observes StudentAttendanceViewModel for attendance and courses data.
+ */
 class StudentAttendanceFragment : Fragment() {
 
     private lateinit var binding: FragmentStudentAttendanceBinding
     private lateinit var adapter: StudentAttendanceAdapter
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    private val viewModel: StudentAttendanceViewModel by viewModels()
 
     private val attendanceList = mutableListOf<Attendance>()
     private val courseList = mutableListOf<Course>()
@@ -44,13 +48,24 @@ class StudentAttendanceFragment : Fragment() {
         binding.rvAttendance.layoutManager = LinearLayoutManager(requireContext())
         binding.rvAttendance.adapter = adapter
 
-        val uid = auth.currentUser?.uid ?: return
-        db.collection("users").whereEqualTo("uid", uid).get()
-            .addOnSuccessListener { userDocs ->
-                if (userDocs.isEmpty) return@addOnSuccessListener
-                val studentId = userDocs.documents[0].getString("studentId") ?: return@addOnSuccessListener
-                loadData(studentId)
-            }
+        // Observe ViewModel
+        viewModel.attendance.observe(viewLifecycleOwner) { list ->
+            attendanceList.clear()
+            attendanceList.addAll(list)
+            refreshList()
+            updateSummaryCards()
+        }
+
+        viewModel.courses.observe(viewLifecycleOwner) { courses ->
+            courseList.clear()
+            courseList.addAll(courses)
+        }
+
+        viewModel.message.observe(viewLifecycleOwner) { msg ->
+            if (msg.startsWith("ERROR:")) Snackbar.make(binding.root, msg.removePrefix("ERROR:"), Snackbar.LENGTH_SHORT).show()
+        }
+
+        viewModel.loadData()
 
         binding.btnSearch.setOnClickListener {
             if (binding.searchLayout.visibility == View.GONE) {
@@ -84,24 +99,11 @@ class StudentAttendanceFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        binding.searchLayout.setEndIconOnClickListener {
-            binding.etSearch.setText("")
-            binding.searchLayout.visibility = View.GONE
-            binding.btnSearch.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            binding.btnSearch.setTextColor(android.graphics.Color.parseColor("#1976D2"))
-            binding.btnSearch.setIconResource(R.drawable.ic_search)
-            binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
-            refreshList()
-        }
-
         binding.btnFilter.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Filter by")
                 .setItems(arrayOf("Course", "Status")) { _, which ->
-                    when (which) {
-                        0 -> showCourseFilterSheet()
-                        1 -> showStatusFilterSheet()
-                    }
+                    when (which) { 0 -> showCourseFilterSheet(); 1 -> showStatusFilterSheet() }
                 }.show()
         }
 
@@ -110,48 +112,8 @@ class StudentAttendanceFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Sort by")
                 .setSingleChoiceItems(sortOptions, sortOptions.indexOf(currentSortOrder)) { dialog, which ->
-                    currentSortOrder = sortOptions[which]
-                    refreshList()
-                    updateSortButton()
-                    dialog.dismiss()
+                    currentSortOrder = sortOptions[which]; refreshList(); updateSortButton(); dialog.dismiss()
                 }.show()
-        }
-    }
-
-    private fun loadData(studentId: String) {
-        binding.progressBar.visibility = View.VISIBLE
-        db.collection("courses").get().addOnSuccessListener { courseDocs ->
-            courseList.clear()
-            courseDocs.forEach { doc ->
-                courseList.add(Course(
-                    courseId = doc.getString("courseId") ?: "",
-                    courseName = doc.getString("courseName") ?: "",
-                    courseCode = doc.getString("courseCode") ?: "",
-                    schedule = doc.getString("schedule") ?: "",
-                    teacherId = doc.getString("teacherId") ?: "",
-                    createdBy = doc.getString("createdBy") ?: "",
-                    docId = doc.id
-                ))
-            }
-            db.collection("attendance").whereEqualTo("studentId", studentId)
-                .addSnapshotListener { snapshot, error ->
-                    binding.progressBar.visibility = View.GONE
-                    if (error != null) return@addSnapshotListener
-                    attendanceList.clear()
-                    snapshot?.documents?.forEach { doc ->
-                        attendanceList.add(Attendance(
-                            attendanceId = doc.getString("attendanceId") ?: "",
-                            studentId = doc.getString("studentId") ?: "",
-                            courseId = doc.getString("courseId") ?: "",
-                            session = doc.getString("timeSlot") ?: "",
-                            date = doc.getString("date") ?: "",
-                            status = doc.getString("status") ?: "",
-                            docId = doc.id
-                        ))
-                    }
-                    refreshList()
-                    updateSummaryCards()
-                }
         }
     }
 
@@ -165,13 +127,12 @@ class StudentAttendanceFragment : Fragment() {
         var list = attendanceList.toMutableList()
         if (currentFilterCourseId.isNotEmpty()) list = list.filter { it.courseId == currentFilterCourseId }.toMutableList()
         if (currentFilterStatus.isNotEmpty()) list = list.filter { it.status == currentFilterStatus }.toMutableList()
-        list = when (currentSortOrder) {
+        return when (currentSortOrder) {
             "Date Newest" -> list.sortedByDescending { it.date }.toMutableList()
             "Date Oldest" -> list.sortedBy { it.date }.toMutableList()
             "Course A-Z" -> list.sortedBy { att -> courseList.find { it.courseId == att.courseId }?.courseName }.toMutableList()
             else -> list
         }
-        return list
     }
 
     private fun showCourseFilterSheet() {
@@ -179,34 +140,23 @@ class StudentAttendanceFragment : Fragment() {
         val sheetView = LayoutInflater.from(requireContext()).inflate(R.layout.bottom_sheet_filter, null)
         bottomSheet.setContentView(sheetView)
         sheetView.findViewById<android.widget.TextView>(R.id.tvFilterTitle).text = "Filter by Course"
-
         val allOptions = listOf(Pair("All Courses", "")) + courseList.map { Pair(it.courseName, it.courseId) }
         var filteredOptions = allOptions.toMutableList()
-
         val rv = sheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvFilterOptions)
         rv.layoutManager = LinearLayoutManager(requireContext())
-
         val filterAdapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
             inner class VH(val b: com.sers.app.databinding.ItemFilterOptionBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(b.root)
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-                val b = com.sers.app.databinding.ItemFilterOptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                return VH(b)
+                val b = com.sers.app.databinding.ItemFilterOptionBinding.inflate(LayoutInflater.from(parent.context), parent, false); return VH(b)
             }
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
-                val option = filteredOptions[position]
-                (holder as VH).b.tvOption.text = option.first
+                val option = filteredOptions[position]; (holder as VH).b.tvOption.text = option.first
                 holder.b.ivCheck.visibility = if (option.second == currentFilterCourseId) View.VISIBLE else View.GONE
-                holder.b.root.setOnClickListener {
-                    currentFilterCourseId = option.second
-                    refreshList()
-                    updateFilterButton()
-                    bottomSheet.dismiss()
-                }
+                holder.b.root.setOnClickListener { currentFilterCourseId = option.second; refreshList(); updateFilterButton(); bottomSheet.dismiss() }
             }
             override fun getItemCount() = filteredOptions.size
             fun updateList(newList: MutableList<Pair<String, String>>) { filteredOptions = newList; notifyDataSetChanged() }
         }
-
         rv.adapter = filterAdapter
         sheetView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etFilterSearch)
             .addTextChangedListener(object : TextWatcher {
@@ -229,10 +179,7 @@ class StudentAttendanceFragment : Fragment() {
         val rv = sheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvFilterOptions)
         rv.layoutManager = LinearLayoutManager(requireContext())
         val filterAdapter = FilterOptionAdapter(allOptions, if (currentFilterStatus.isEmpty()) "All" else currentFilterStatus) { selected ->
-            currentFilterStatus = if (selected == "All") "" else selected
-            refreshList()
-            updateFilterButton()
-            bottomSheet.dismiss()
+            currentFilterStatus = if (selected == "All") "" else selected; refreshList(); updateFilterButton(); bottomSheet.dismiss()
         }
         rv.adapter = filterAdapter
         bottomSheet.show()
