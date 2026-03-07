@@ -4,19 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.sers.app.utils.ThemeHelper
 import com.google.android.material.snackbar.Snackbar
 import com.sers.app.databinding.ActivityLoginBinding
 import com.sers.app.ui.admin.AdminMainActivity
-import com.sers.app.ui.teacher.TeacherMainActivity
 import com.sers.app.ui.student.StudentMainActivity
+import com.sers.app.ui.teacher.TeacherMainActivity
+import com.sers.app.utils.ThemeHelper
 import com.sers.app.viewmodel.LoginViewModel
 
-/**
- * LoginActivity — MVVM View
- * Observes LoginViewModel.loginResult LiveData.
- * No Firebase or business logic here.
- */
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
@@ -28,7 +23,6 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Observe login results from ViewModel
         viewModel.loginResult.observe(this) { result ->
             if (result.startsWith("ERROR:")) {
                 val message = result.removePrefix("ERROR:")
@@ -36,12 +30,10 @@ class LoginActivity : AppCompatActivity() {
                 binding.btnSignIn.text = "Sign In"
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
             } else {
-                // result is the role string
                 navigateByRole(result)
             }
         }
 
-        // Auto-login if already signed in
         viewModel.checkCurrentUser()
 
         binding.btnSignIn.setOnClickListener {
@@ -68,29 +60,38 @@ class LoginActivity : AppCompatActivity() {
                 binding.tilPassword.error = null
             }
 
-            // Show loading state
             binding.btnSignIn.isEnabled = false
             binding.btnSignIn.text = "Signing in..."
-
-            // Delegate to ViewModel
             viewModel.login(email, password)
+        }
+
+        binding.tvForgotPassword.setOnClickListener {
+            val email = binding.etEmail.text.toString().trim()
+            if (email.isEmpty()) {
+                binding.tilEmail.error = "Enter your email first"
+                return@setOnClickListener
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.error = "Please enter a valid email address"
+                return@setOnClickListener
+            }
+            binding.tilEmail.error = null
+            com.google.firebase.auth.FirebaseAuth.getInstance()
+                .sendPasswordResetEmail(email)
+                .addOnSuccessListener {
+                    Snackbar.make(binding.root, "Reset email sent! Check your inbox.", Snackbar.LENGTH_LONG).show()
+                }
+                .addOnFailureListener { e ->
+                    Snackbar.make(binding.root, "Failed: ${e.message}", Snackbar.LENGTH_LONG).show()
+                }
         }
     }
 
     private fun navigateByRole(role: String) {
         when (role) {
-            "Admin" -> {
-                startActivity(Intent(this, AdminMainActivity::class.java))
-                finish()
-            }
-            "Teacher" -> {
-                startActivity(Intent(this, TeacherMainActivity::class.java))
-                finish()
-            }
-            "Student" -> {
-                startActivity(Intent(this, StudentMainActivity::class.java))
-                finish()
-            }
+            "Admin" -> { startActivity(Intent(this, AdminMainActivity::class.java)); finish() }
+            "Teacher" -> { startActivity(Intent(this, TeacherMainActivity::class.java)); finish() }
+            "Student" -> { startActivity(Intent(this, StudentMainActivity::class.java)); finish() }
             else -> {
                 binding.btnSignIn.isEnabled = true
                 binding.btnSignIn.text = "Sign In"

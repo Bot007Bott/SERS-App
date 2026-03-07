@@ -114,12 +114,16 @@ class TeacherGradeViewModel : ViewModel() {
 
     fun saveGrade(docId: String?, data: Map<String, Any>) {
         if (docId != null) {
+            // Update — don't change the date
             db.collection("grades").document(docId).update(data)
                 .addOnSuccessListener { _message.value = "Grade updated!" }
                 .addOnFailureListener { e -> _message.value = "ERROR:${e.message}" }
         } else {
+            // Add — save today's date
+            val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
             val newData = data.toMutableMap()
             newData["gradeId"] = "G${System.currentTimeMillis()}"
+            newData["date"] = today
             db.collection("grades").add(newData)
                 .addOnSuccessListener { _message.value = "Grade added!" }
                 .addOnFailureListener { e -> _message.value = "ERROR:${e.message}" }

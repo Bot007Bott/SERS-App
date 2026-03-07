@@ -299,9 +299,14 @@ class UserManagementFragment : Fragment() {
             if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || email.isEmpty() || role.isEmpty() || password.isEmpty()) {
                 Snackbar.make(binding.root, "Please fill in all fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
             }
-            if (password.length < 6) { Snackbar.make(binding.root, "Password must be at least 6 characters", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Snackbar.make(binding.root, "Please enter a valid email address", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            if (password.length < 6) {
+                Snackbar.make(binding.root, "Password must be at least 6 characters", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener
+            }
 
-            viewModel.createUser(firstName, lastName, username, email, role, password, selectedProfileId)
+            viewModel.createUser(email, password, firstName, lastName, username, role, selectedProfileId)
             dialog.dismiss()
         }
         dialog.show()
@@ -324,7 +329,7 @@ class UserManagementFragment : Fragment() {
         dialogView.findViewById<TextInputEditText>(R.id.etUsername).setText(user.username)
         dialogView.findViewById<TextInputEditText>(R.id.etEmail).setText(user.email)
         dialogView.findViewById<TextInputEditText>(R.id.etPassword).apply { visibility = View.GONE; isEnabled = false }
-        // passwordLayout hidden — password field already hidden above
+        dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.passwordLayout).visibility = View.GONE
         actvRole.setText(user.role, false)
 
         val btnLinkProfile = dialogView.findViewById<MaterialButton>(R.id.btnLinkProfile)

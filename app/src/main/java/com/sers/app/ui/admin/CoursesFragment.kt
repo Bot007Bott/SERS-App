@@ -23,10 +23,6 @@ import com.sers.app.model.Course
 import com.sers.app.model.Teacher
 import com.sers.app.viewmodel.CourseViewModel
 
-/**
- * CoursesFragment — MVVM View
- * Observes CourseViewModel for course and teacher data.
- */
 class CoursesFragment : Fragment() {
 
     private lateinit var binding: FragmentCoursesBinding
@@ -35,6 +31,7 @@ class CoursesFragment : Fragment() {
 
     private val teacherList = mutableListOf<Teacher>()
     private var currentSortOrder = "Default"
+    private var currentFilter = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentCoursesBinding.inflate(inflater, container, false)
@@ -55,27 +52,40 @@ class CoursesFragment : Fragment() {
         setupObservers()
         setupSearch()
         setupSort()
+        setupFilter()
 
         binding.btnAddCourse.setOnClickListener { showCourseDialog(null) }
-        
+
         viewModel.loadTeachersAndCourses()
     }
 
     private fun setupObservers() {
-        viewModel.courses.observe(viewLifecycleOwner) { courses ->
+        viewModel.courses.observe(viewLifecycleOwner) {
             binding.progressBar.visibility = View.GONE
             refreshList()
         }
-
         viewModel.teachers.observe(viewLifecycleOwner) { teachers ->
             teacherList.clear()
             teacherList.addAll(teachers)
             adapter.setTeachers(teachers)
         }
-
         viewModel.message.observe(viewLifecycleOwner) { msg ->
-            if (msg.isNotEmpty()) {
-                Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
+            if (msg.isNotEmpty()) Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupFilter() {
+        binding.btnFilter.setOnClickListener {
+            val opts = listOf("All Teachers" to "") + teacherList.map { "${it.firstName} ${it.lastName} (${it.teacherId})" to it.teacherId }
+            showPickerSheet("Filter by Teacher", opts) { _, id ->
+                currentFilter = id
+                refreshList()
+                val active = currentFilter.isNotEmpty()
+                binding.btnFilter.text = if (active) "Filter •" else "Filter"
+                binding.btnFilter.setBackgroundColor(if (active) android.graphics.Color.parseColor("#1976D2") else android.graphics.Color.TRANSPARENT)
+                binding.btnFilter.setTextColor(if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
+                binding.btnFilter.iconTint = android.content.res.ColorStateList.valueOf(
+                    if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
             }
         }
     }
@@ -98,15 +108,11 @@ class CoursesFragment : Fragment() {
                 refreshList()
             }
         }
-
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                refreshList()
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { refreshList() }
             override fun afterTextChanged(s: Editable?) {}
         })
-
         binding.searchLayout.setEndIconOnClickListener {
             binding.etSearch.setText("")
             binding.searchLayout.visibility = View.GONE
@@ -135,11 +141,13 @@ class CoursesFragment : Fragment() {
     private fun refreshList() {
         val query = binding.etSearch.text.toString().lowercase()
         val allCourses = viewModel.courses.value ?: emptyList()
-        
+
         var list = allCourses.filter {
             it.courseName.contains(query, ignoreCase = true) ||
-            it.courseCode.contains(query, ignoreCase = true)
+                    it.courseCode.contains(query, ignoreCase = true)
         }
+
+        if (currentFilter.isNotEmpty()) list = list.filter { it.teacherId == currentFilter }
 
         list = when (currentSortOrder) {
             "Name A-Z" -> list.sortedBy { it.courseName }
@@ -152,16 +160,12 @@ class CoursesFragment : Fragment() {
     }
 
     private fun updateSortButtonUI() {
-        binding.btnSort.text = if (currentSortOrder == "Default") "Sort" else "Sort •"
-        binding.btnSort.setBackgroundColor(
-            if (currentSortOrder == "Default") android.graphics.Color.TRANSPARENT
-            else android.graphics.Color.parseColor("#1976D2"))
-        binding.btnSort.setTextColor(
-            if (currentSortOrder == "Default") android.graphics.Color.parseColor("#1976D2")
-            else android.graphics.Color.WHITE)
+        val active = currentSortOrder != "Default"
+        binding.btnSort.text = if (active) "Sort •" else "Sort"
+        binding.btnSort.setBackgroundColor(if (active) android.graphics.Color.parseColor("#1976D2") else android.graphics.Color.TRANSPARENT)
+        binding.btnSort.setTextColor(if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
         binding.btnSort.iconTint = android.content.res.ColorStateList.valueOf(
-            if (currentSortOrder == "Default") android.graphics.Color.parseColor("#1976D2")
-            else android.graphics.Color.WHITE)
+            if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
     }
 
     private fun showCourseDialog(course: Course?) {
@@ -173,10 +177,8 @@ class CoursesFragment : Fragment() {
         dialogView.findViewById<TextView>(R.id.tvSubtitle).text = if (isEdit) "Update course information" else "Fill in the course information below"
         dialogView.findViewById<MaterialButton>(R.id.btnSave).text = if (isEdit) "Update Course" else "Add Course"
 
-        val actvTeacher = dialogView.findViewById<AutoCompleteTextView>(R.id.actvTeacher)
-        val teacherNames = teacherList.map { "${it.firstName} ${it.lastName}" }
-        actvTeacher.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, teacherNames))
-
+        // Teacher — now a button that opens bottom sheet picker
+        val btnSelectTeacher = dialogView.findViewById<MaterialButton>(R.id.actvTeacher)
         val actvDay = dialogView.findViewById<AutoCompleteTextView>(R.id.actvDay)
         val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         actvDay.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, days))
@@ -187,18 +189,26 @@ class CoursesFragment : Fragment() {
         val etCourseName = dialogView.findViewById<TextInputEditText>(R.id.etCourseName)
         val etCourseCode = dialogView.findViewById<TextInputEditText>(R.id.etCourseCode)
 
+        var selectedTeacherId = ""
+
         fun buildSchedule() {
             val day = actvDay.text.toString().trim()
             val start = etStartTime.text.toString().trim()
             val end = etEndTime.text.toString().trim()
-            if (day.isNotEmpty() && start.isNotEmpty() && end.isNotEmpty()) { etSchedule.setText("$day $start - $end") }
+            if (day.isNotEmpty() && start.isNotEmpty() && end.isNotEmpty()) {
+                etSchedule.setText("$day $start - $end")
+            }
         }
 
         etStartTime.setOnClickListener {
-            TimePickerDialog(requireContext(), { _, h, m -> etStartTime.setText(String.format("%02d:%02d", h, m)); buildSchedule() }, 9, 0, true).show()
+            TimePickerDialog(requireContext(), { _, h, m ->
+                etStartTime.setText(String.format("%02d:%02d", h, m)); buildSchedule()
+            }, 9, 0, true).show()
         }
         etEndTime.setOnClickListener {
-            TimePickerDialog(requireContext(), { _, h, m -> etEndTime.setText(String.format("%02d:%02d", h, m)); buildSchedule() }, 11, 0, true).show()
+            TimePickerDialog(requireContext(), { _, h, m ->
+                etEndTime.setText(String.format("%02d:%02d", h, m)); buildSchedule()
+            }, 11, 0, true).show()
         }
         actvDay.setOnItemClickListener { _, _, _, _ -> buildSchedule() }
 
@@ -218,27 +228,57 @@ class CoursesFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        var selectedTeacherId = ""
-
         if (isEdit) {
-            etCourseName.setText(course!!.courseName); etCourseCode.setText(course.courseCode)
+            etCourseName.setText(course!!.courseName)
+            etCourseCode.setText(course.courseCode)
             val parts = course.schedule.split(" ")
-            if (parts.size >= 4) { actvDay.setText(parts[0], false); etStartTime.setText(parts[1]); etEndTime.setText(parts[3]) }
+            if (parts.size >= 4) {
+                actvDay.setText(parts[0], false)
+                etStartTime.setText(parts[1])
+                etEndTime.setText(parts[3])
+            }
             etSchedule.setText(course.schedule)
             val teacher = teacherList.find { it.teacherId == course.teacherId }
-            if (teacher != null) { actvTeacher.setText("${teacher.firstName} ${teacher.lastName}", false); selectedTeacherId = teacher.teacherId }
+            if (teacher != null) {
+                selectedTeacherId = teacher.teacherId
+                btnSelectTeacher.text = "${teacher.firstName} ${teacher.lastName}"
+            }
         }
 
-        actvTeacher.setOnItemClickListener { _, _, position, _ -> selectedTeacherId = teacherList[position].teacherId }
+        // Teacher picker — bottom sheet with search
+        btnSelectTeacher.setOnClickListener {
+            val opts = listOf("No Teacher" to "") + teacherList.map { "${it.firstName} ${it.lastName} (${it.teacherId})" to it.teacherId }
+            showPickerSheet("Assign Teacher", opts) { _, id ->
+                selectedTeacherId = id
+                if (id.isEmpty()) {
+                    btnSelectTeacher.text = "No Teacher"
+                } else {
+                    val t = teacherList.find { it.teacherId == id }
+                    btnSelectTeacher.text = if (t != null) "${t.firstName} ${t.lastName}" else id
+                }
+            }
+        }
 
         dialogView.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<MaterialButton>(R.id.btnSave).setOnClickListener {
-            val name = etCourseName.text.toString().trim(); val code = etCourseCode.text.toString().trim(); val schedule = etSchedule.text.toString().trim()
-            if (name.isEmpty() || code.isEmpty()) { Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
+            val name = etCourseName.text.toString().trim()
+            val code = etCourseCode.text.toString().trim()
+            val schedule = etSchedule.text.toString().trim()
+
+            if (name.isEmpty() || code.isEmpty()) {
+                Snackbar.make(binding.root, "Please fill in all required fields", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             val list = viewModel.courses.value ?: emptyList()
-            if (list.any { it.courseName.equals(name, true) && it.docId != (course?.docId ?: "") }) { Snackbar.make(binding.root, "Course name already exists!", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
-            if (list.any { it.courseCode.equals(code, true) && it.docId != (course?.docId ?: "") }) { Snackbar.make(binding.root, "Course code already exists!", Snackbar.LENGTH_SHORT).show(); return@setOnClickListener }
+            if (list.any { it.courseName.equals(name, true) && it.docId != (course?.docId ?: "") }) {
+                Snackbar.make(binding.root, "Course name already exists!", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (list.any { it.courseCode.equals(code, true) && it.docId != (course?.docId ?: "") }) {
+                Snackbar.make(binding.root, "Course code already exists!", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             if (isEdit) viewModel.updateCourse(course!!.docId, name, code, schedule, selectedTeacherId)
             else viewModel.addCourse(Course(courseId = "C${System.currentTimeMillis()}", courseName = name, courseCode = code, schedule = schedule, teacherId = selectedTeacherId, createdBy = "Admin", docId = ""))
@@ -249,13 +289,50 @@ class CoursesFragment : Fragment() {
 
     private fun showDeleteDialog(course: Course) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete Course").setMessage("Are you sure you want to delete ${course.courseName}?")
+            .setTitle("Delete Course")
+            .setMessage("Are you sure you want to delete ${course.courseName}?")
             .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
-            .setPositiveButton("Delete") { d, _ -> viewModel.deleteCourse(course.docId); d.dismiss() }.show()
+            .setPositiveButton("Delete") { d, _ -> viewModel.deleteCourse(course.docId); d.dismiss() }
+            .show()
     }
 
     private fun updateEmptyState(list: List<Any>) {
         binding.emptyState.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
         binding.rvCourses.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun showPickerSheet(title: String, options: List<Pair<String, String>>, onSelect: (String, String) -> Unit) {
+        val bottomSheet = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
+        val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_filter, null)
+        bottomSheet.setContentView(sheetView)
+        sheetView.findViewById<android.widget.TextView>(R.id.tvFilterTitle).text = title
+        val allOptions = options.toMutableList()
+        var filteredOptions = allOptions.toMutableList()
+        val rv = sheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvFilterOptions)
+        rv.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+        val adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+            inner class VH(val b: com.sers.app.databinding.ItemFilterOptionBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(b.root)
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
+                VH(com.sers.app.databinding.ItemFilterOptionBinding.inflate(layoutInflater, parent, false))
+            override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
+                val opt = filteredOptions[pos]
+                (holder as VH).b.tvOption.text = opt.first
+                holder.b.ivCheck.visibility = View.GONE
+                holder.b.root.setOnClickListener { onSelect(opt.first, opt.second); bottomSheet.dismiss() }
+            }
+            override fun getItemCount() = filteredOptions.size
+            fun update(list: MutableList<Pair<String, String>>) { filteredOptions = list; notifyDataSetChanged() }
+        }
+        rv.adapter = adapter
+        sheetView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etFilterSearch)
+            .addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+                override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {
+                    val q = s.toString().lowercase()
+                    adapter.update(if (q.isEmpty()) allOptions.toMutableList() else allOptions.filter { it.first.lowercase().contains(q) }.toMutableList())
+                }
+                override fun afterTextChanged(s: android.text.Editable?) {}
+            })
+        bottomSheet.show()
     }
 }

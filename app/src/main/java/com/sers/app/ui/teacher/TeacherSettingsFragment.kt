@@ -1,11 +1,9 @@
 package com.sers.app.ui.teacher
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,14 +23,6 @@ class TeacherSettingsFragment : Fragment() {
     private lateinit var binding: FragmentSettingsBinding
     private val viewModel: ProfileViewModel by viewModels()
     private var userDocId = ""
-
-    private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            binding.ivProfilePicture.setImageURI(it)
-            binding.tvAvatar.text = ""
-            Snackbar.make(binding.root, "Profile picture updated!", Snackbar.LENGTH_SHORT).show()
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
@@ -73,7 +63,6 @@ class TeacherSettingsFragment : Fragment() {
             ThemeHelper.setDarkMode(requireContext(), isChecked)
         }
 
-        binding.btnChangePhoto.setOnClickListener { pickImage.launch("image/*") }
         binding.btnSaveInfo.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val phone = binding.etPhone.text.toString().trim()

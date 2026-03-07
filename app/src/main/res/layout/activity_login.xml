@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Logo Icon -->
         <ImageView
             android:layout_width="72dp"
             android:layout_height="72dp"
@@ -21,7 +20,6 @@
             android:src="@drawable/ic_launcher_foreground"
             app:tint="?attr/colorPrimary" />
 
-        <!-- App Name -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,7 +30,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
-        <!-- Subtitle -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +38,6 @@
             android:textSize="14sp"
             android:layout_marginBottom="32dp"/>
 
-        <!-- Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +51,6 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Email Field -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -72,7 +67,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:hint="Enter your email">
-
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etEmail"
                         android:layout_width="match_parent"
@@ -80,7 +74,6 @@
                         android:inputType="textEmailAddress"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Password Field -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -99,7 +92,6 @@
                     app:passwordToggleEnabled="true"
                     app:endIconMode="password_toggle"
                     android:layout_marginBottom="24dp">
-
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPassword"
                         android:layout_width="match_parent"
@@ -109,7 +101,6 @@
                         android:importantForAutofill="no"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Sign In Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSignIn"
                     android:layout_width="match_parent"
@@ -119,6 +110,19 @@
                     android:textColor="#FFFFFF"
                     app:backgroundTint="?attr/colorPrimary"
                     app:cornerRadius="12dp"/>
+
+                <!-- Forgot Password link -->
+                <TextView
+                    android:id="@+id/tvForgotPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:text="Forgot Password?"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="14sp"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

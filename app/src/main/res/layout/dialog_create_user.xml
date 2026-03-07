@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:maxHeight="600dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,25 +12,24 @@
         android:padding="24dp">
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create New User"
-            android:id="@+id/tvTitle"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="4dp"/>
 
         <TextView
+            android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add a new user account to the system"
-            android:id="@+id/tvSubtitle"
             android:textSize="13sp"
             android:textColor="?android:textColorSecondary"
             android:layout_marginBottom="20dp"/>
 
-        <!-- First Name -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -43,7 +43,6 @@
                 android:inputType="textPersonName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Last Name -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -57,7 +56,6 @@
                 android:inputType="textPersonName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Username -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -71,7 +69,6 @@
                 android:inputType="text"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -85,7 +82,6 @@
                 android:inputType="textEmailAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Role Dropdown -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
@@ -99,7 +95,6 @@
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Link Profile Dropdown (shown when role is Student or Teacher) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLinkProfile"
             style="@style/Widget.Material3.Button.OutlinedButton"
@@ -111,8 +106,9 @@
             app:strokeColor="?attr/colorPrimary"
             app:cornerRadius="8dp"/>
 
-        <!-- Password -->
+        <!-- Password field — hidden in edit mode via passwordLayout id -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLayout"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,7 +122,6 @@
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Buttons -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreate"
             android:layout_width="match_parent"

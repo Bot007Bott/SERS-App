@@ -106,18 +106,26 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Assign Teacher -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Assign Teacher"
+            android:textSize="13sp"
+            android:textColor="?android:textColorSecondary"
+            android:layout_marginBottom="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/actvTeacher"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Select Teacher"
+            android:textAlignment="textStart"
+            android:gravity="start|center_vertical"
             android:layout_marginBottom="12dp"
-            android:hint="Assign Teacher">
-            <AutoCompleteTextView
-                android:id="@+id/actvTeacher"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            app:strokeColor="?attr/colorPrimary"
+            app:cornerRadius="8dp"
+            app:iconGravity="end" />
 
         <!-- Schedule (auto-built from Day + Start/End time) -->
         <com.google.android.material.textfield.TextInputLayout

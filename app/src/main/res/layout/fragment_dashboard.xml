@@ -33,128 +33,145 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_marginBottom="20dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
+            <!-- Row 1: Total Users + Students -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total Users"
-                        android:textSize="11sp"
-                        android:textColor="?android:textColorSecondary"/>
-                    <TextView
-                        android:id="@+id/tvTotalUsers"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorPrimary"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="6dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Students"
-                        android:textSize="11sp"
-                        android:textColor="?android:textColorSecondary"/>
-                    <TextView
-                        android:id="@+id/tvTotalStudents"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorPrimary"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Users"
+                            android:textSize="11sp"
+                            android:textColor="?android:textColorSecondary"/>
+                        <TextView
+                            android:id="@+id/tvTotalUsers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Courses"
-                        android:textSize="11sp"
-                        android:textColor="?android:textColorSecondary"/>
-                    <TextView
-                        android:id="@+id/tvTotalCourses"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorPrimary"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Students"
+                            android:textSize="11sp"
+                            android:textColor="?android:textColorSecondary"/>
+                        <TextView
+                            android:id="@+id/tvTotalStudents"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
+            </LinearLayout>
+
+            <!-- Row 2: Courses + Teachers -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Teachers"
-                        android:textSize="11sp"
-                        android:textColor="?android:textColorSecondary"/>
-                    <TextView
-                        android:id="@+id/tvTotalTeachers"
-                        android:layout_width="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Courses"
+                            android:textSize="11sp"
+                            android:textColor="?android:textColorSecondary"/>
+                        <TextView
+                            android:id="@+id/tvTotalCourses"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorPrimary"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Teachers"
+                            android:textSize="11sp"
+                            android:textColor="?android:textColorSecondary"/>
+                        <TextView
+                            android:id="@+id/tvTotalTeachers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
         </LinearLayout>
 

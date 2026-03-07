@@ -31,6 +31,8 @@ class TeacherManagementFragment : Fragment() {
 
     private var currentSortOrder = "Default"
 
+    private var currentFilter = ""
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTeacherManagementBinding.inflate(inflater, container, false)
         return binding.root
@@ -50,6 +52,7 @@ class TeacherManagementFragment : Fragment() {
         setupObservers()
         setupSearch()
         setupSort()
+        setupFilter()
 
         binding.btnAddTeacher.setOnClickListener { showTeacherDialog(null) }
 
@@ -66,6 +69,35 @@ class TeacherManagementFragment : Fragment() {
             if (msg.isNotEmpty()) {
                 Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun setupFilter() {
+        binding.btnFilter.setOnClickListener {
+            val departments = (viewModel.teachers.value ?: emptyList())
+                .map { it.department }
+                .filter { it.isNotEmpty() }
+                .distinct()
+                .sorted()
+
+            val options = arrayOf("All Departments") + departments.toTypedArray()
+            val currentIndex = if (currentFilter.isEmpty()) 0 else options.indexOf(currentFilter)
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Filter by Department")
+                .setSingleChoiceItems(options, currentIndex) { dialog, which ->
+                    currentFilter = if (which == 0) "" else options[which]
+                    refreshList()
+                    binding.btnFilter.text = if (currentFilter.isEmpty()) "Filter" else "Filter •"
+                    binding.btnFilter.setBackgroundColor(
+                        if (currentFilter.isEmpty()) android.graphics.Color.TRANSPARENT
+                        else android.graphics.Color.parseColor("#1976D2"))
+                    binding.btnFilter.setTextColor(
+                        if (currentFilter.isEmpty()) android.graphics.Color.parseColor("#1976D2")
+                        else android.graphics.Color.WHITE)
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
@@ -131,6 +163,10 @@ class TeacherManagementFragment : Fragment() {
                     it.lastName.contains(query, ignoreCase = true) ||
                     it.email.contains(query, ignoreCase = true) ||
                     it.department.contains(query, ignoreCase = true)
+        }
+
+        if (currentFilter.isNotEmpty()) {
+            list = list.filter { it.department.equals(currentFilter, ignoreCase = true) }
         }
 
         list = when (currentSortOrder) {

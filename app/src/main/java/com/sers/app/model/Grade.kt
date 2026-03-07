@@ -8,5 +8,6 @@ data class Grade(
     val title: String = "",
     val score: Int = 0,
     val totalMarks: Int = 100,
+    val date: String = "",
     val docId: String = ""
 )
