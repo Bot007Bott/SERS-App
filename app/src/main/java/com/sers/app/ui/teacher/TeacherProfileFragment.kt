@@ -41,7 +41,23 @@ class TeacherProfileFragment : Fragment() {
             binding.tvTeacherId.text = user.teacherId
             binding.tvAvatar.text = user.firstName.take(1).uppercase()
             binding.tvEmail.text = user.email
-            // phone and department loaded separately via phone/department LiveData
+            binding.tvPhone.text = user.phone.ifEmpty { "Not set" }
+
+            if (user.teacherId.isNotEmpty()) {
+                com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("teachers")
+                    .whereEqualTo("teacherId", user.teacherId)
+                    .get()
+                    .addOnSuccessListener { docs ->
+                        val department = docs.documents.firstOrNull()?.getString("department") ?: ""
+                        binding.tvDepartment.text = department.ifEmpty { "Not set" }
+                    }
+                    .addOnFailureListener {
+                        binding.tvDepartment.text = "Not set"
+                    }
+            } else {
+                binding.tvDepartment.text = "Not set"
+            }
         }
 
         courseViewModel.courses.observe(viewLifecycleOwner) { courses ->

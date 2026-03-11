@@ -30,6 +30,8 @@ class StudentGradesFragment : Fragment() {
     private val courseList = mutableListOf<Course>()
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentStudentGradesBinding.inflate(inflater, container, false)
         return binding.root
@@ -66,6 +68,7 @@ class StudentGradesFragment : Fragment() {
 
         // Search toggle
         binding.btnSearch.setOnClickListener {
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
             if (binding.searchLayout.visibility == View.GONE) {
                 binding.searchLayout.visibility = View.VISIBLE
                 binding.btnSearch.setBackgroundColor(android.graphics.Color.parseColor("#1976D2"))
@@ -81,6 +84,17 @@ class StudentGradesFragment : Fragment() {
                 binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
                 refreshList()
             }
+        }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.etSearch.setText("")
+            binding.searchLayout.visibility = View.GONE
+            binding.btnSearch.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            binding.btnSearch.setTextColor(android.graphics.Color.parseColor("#1976D2"))
+            binding.btnSearch.setIconResource(R.drawable.ic_search)
+            binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
+            refreshList()
         }
 
         binding.etSearch.addTextChangedListener(object : TextWatcher {

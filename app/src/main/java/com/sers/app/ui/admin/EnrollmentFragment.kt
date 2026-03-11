@@ -35,6 +35,10 @@ class EnrollmentFragment : Fragment() {
     private lateinit var enrolledAdapter: EnrolledStudentAdapter
     private lateinit var courseAdapter: EnrollmentCourseAdapter
 
+    private var isClosingFromX = false
+
+    private val teacherList = mutableListOf<com.sers.app.model.Teacher>()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentEnrollmentBinding.inflate(inflater, container, false)
         return binding.root
@@ -66,6 +70,7 @@ class EnrollmentFragment : Fragment() {
         setupSort()
 
         viewModel.loadAllData()
+        loadTeachers()
     }
 
     private fun setupObservers() {
@@ -116,6 +121,7 @@ class EnrollmentFragment : Fragment() {
 
     private fun setupSearch() {
         binding.btnSearch.setOnClickListener {
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
             if (binding.searchLayout.visibility == View.GONE) {
                 binding.searchLayout.visibility = View.VISIBLE
             } else {
@@ -124,6 +130,14 @@ class EnrollmentFragment : Fragment() {
                 refreshList()
             }
         }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.etSearch.setText("")
+            binding.searchLayout.visibility = View.GONE
+            refreshList()
+        }
+
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { refreshList() }
@@ -181,6 +195,26 @@ class EnrollmentFragment : Fragment() {
         showPickerSheet("Enroll Student", options) { _, id ->
             viewModel.enrollStudent(id, selectedCourseId)
         }
+    }
+
+    private fun loadTeachers() {
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("teachers").get()
+            .addOnSuccessListener { docs ->
+                teacherList.clear()
+                teacherList.addAll(docs.map { doc ->
+                    com.sers.app.model.Teacher(
+                        teacherId = doc.getString("teacherId") ?: "",
+                        firstName = doc.getString("firstName") ?: "",
+                        lastName = doc.getString("lastName") ?: "",
+                        email = doc.getString("email") ?: "",
+                        department = doc.getString("department") ?: "",
+                        phone = doc.getString("phone") ?: "",
+                        docId = doc.id
+                    )
+                })
+                courseAdapter.setTeachers(teacherList)
+            }
     }
 
     private fun showPickerSheet(title: String, options: List<Pair<String, String>>, onSelect: (String, String) -> Unit) {

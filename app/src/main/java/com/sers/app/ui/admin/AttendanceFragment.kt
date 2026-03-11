@@ -39,6 +39,8 @@ class AttendanceFragment : Fragment() {
     private var selectedFilterStatus = ""
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAttendanceBinding.inflate(inflater, container, false)
         return binding.root
@@ -87,10 +89,24 @@ class AttendanceFragment : Fragment() {
 
     private fun setupSearch() {
         binding.btnSearch.setOnClickListener {
-            val isVisible = binding.searchLayout.visibility == View.VISIBLE
-            binding.searchLayout.visibility = if (isVisible) View.GONE else View.VISIBLE
-            if (!isVisible) binding.etSearch.requestFocus()
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
+            if (binding.searchLayout.visibility == View.GONE) {
+                binding.searchLayout.visibility = View.VISIBLE
+                binding.etSearch.requestFocus()
+            } else {
+                binding.etSearch.setText("")
+                binding.searchLayout.visibility = View.GONE
+                refreshList()
+            }
         }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.etSearch.setText("")
+            binding.searchLayout.visibility = View.GONE
+            refreshList()
+        }
+
         binding.etSearch.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { refreshList() }
@@ -131,11 +147,11 @@ class AttendanceFragment : Fragment() {
                     0 -> { selectedFilterStudentId = ""; selectedFilterCourseId = ""; selectedFilterStatus = ""; updateFilterButtonUI(); refreshList() }
                     1 -> {
                         val opts = listOf("All Students" to "") + studentList.map { "${it.firstName} ${it.lastName} (${it.studentId})" to it.studentId }
-                        showPickerSheet("Filter by Student", opts) { _, id -> selectedFilterStudentId = id; updateFilterButtonUI(); refreshList() }
+                        showPickerSheet("Filter by Student", opts, selectedFilterStudentId) { _, id -> selectedFilterStudentId = id; updateFilterButtonUI(); refreshList() }
                     }
                     2 -> {
                         val opts = listOf("All Courses" to "") + courseList.map { "${it.courseName} (${it.courseCode})" to it.courseId }
-                        showPickerSheet("Filter by Course", opts) { _, id -> selectedFilterCourseId = id; updateFilterButtonUI(); refreshList() }
+                        showPickerSheet("Filter by Course", opts, selectedFilterCourseId) { _, id -> selectedFilterCourseId = id; updateFilterButtonUI(); refreshList() }
                     }
                     3 -> showStatusPickerDialog()
                 }
@@ -329,7 +345,7 @@ class AttendanceFragment : Fragment() {
         binding.rvAttendance.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
     }
 
-    private fun showPickerSheet(title: String, options: List<Pair<String, String>>, onSelect: (String, String) -> Unit) {
+    private fun showPickerSheet(title: String, options: List<Pair<String, String>>, currentValue: String = "", onSelect: (String, String) -> Unit) {
         val bottomSheet = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
         val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_filter, null)
         bottomSheet.setContentView(sheetView)
@@ -345,7 +361,7 @@ class AttendanceFragment : Fragment() {
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
                 val opt = filteredOptions[pos]
                 (holder as VH).b.tvOption.text = opt.first
-                holder.b.ivCheck.visibility = View.GONE
+                holder.b.ivCheck.visibility = if (opt.second == currentValue) View.VISIBLE else View.GONE
                 holder.b.root.setOnClickListener { onSelect(opt.first, opt.second); bottomSheet.dismiss() }
             }
             override fun getItemCount() = filteredOptions.size

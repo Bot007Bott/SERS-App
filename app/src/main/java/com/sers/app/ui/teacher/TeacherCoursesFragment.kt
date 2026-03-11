@@ -31,6 +31,8 @@ class TeacherCoursesFragment : Fragment() {
     private val fullCourseList = mutableListOf<Course>()
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTeacherCoursesBinding.inflate(inflater, container, false)
         return binding.root
@@ -68,7 +70,19 @@ class TeacherCoursesFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.btnSearch.setOnClickListener { toggleSearch() }
+        binding.btnSearch.setOnClickListener {
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
+            toggleSearch()
+        }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.searchLayout.visibility = View.GONE
+            binding.etSearch.setText("")
+            binding.btnSearch.setIconResource(R.drawable.ic_search)
+            updateUI()
+        }
+
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { updateUI() }
@@ -76,7 +90,6 @@ class TeacherCoursesFragment : Fragment() {
         })
         binding.btnSort.setOnClickListener { showSortDialog() }
     }
-
     private fun toggleSearch() {
         if (binding.searchLayout.visibility == View.GONE) {
             binding.searchLayout.visibility = View.VISIBLE

@@ -65,7 +65,7 @@ class TeacherReportFragment : Fragment() {
     private fun setupObservers() {
         viewModel.courses.observe(viewLifecycleOwner) { list ->
             courseList.clear()
-            courseList.addAll(list.filter { it.teacherId == myTeacherId })
+            courseList.addAll(list)
         }
         viewModel.students.observe(viewLifecycleOwner) { list -> studentList.clear(); studentList.addAll(list) }
         viewModel.enrollments.observe(viewLifecycleOwner) { list -> enrollmentList.clear(); enrollmentList.addAll(list) }
@@ -153,7 +153,7 @@ class TeacherReportFragment : Fragment() {
         if (selectedYear.isNotEmpty()) reportText.append("Year: $selectedYear\n")
         reportText.append("\n")
 
-        val targetCourses = if (selectedCourseId.isEmpty()) courseList
+        val targetCourses = if (selectedCourseId.isEmpty()) courseList.filter { it.teacherId == myTeacherId }
         else courseList.filter { it.courseId == selectedCourseId }
 
         val enrolledSIds = enrollmentList
@@ -202,7 +202,7 @@ class TeacherReportFragment : Fragment() {
             val csv = StringBuilder()
             csv.append("Student ID,Student Name,Total Grades,Average Score,Present,Absent,Late,Total Attendance\n")
 
-            val targetCourses = if (selectedCourseId.isEmpty()) courseList
+            val targetCourses = if (selectedCourseId.isEmpty()) courseList.filter { it.teacherId == myTeacherId }
             else courseList.filter { it.courseId == selectedCourseId }
             val enrolledSIds = enrollmentList
                 .filter { e -> targetCourses.any { it.courseId == e.courseId } }
@@ -276,7 +276,7 @@ class TeacherReportFragment : Fragment() {
             }
             canvas.drawLine(margin, y, 555f, y, linePaint); y += 20f
 
-            val targetCourses = if (selectedCourseId.isEmpty()) courseList else courseList.filter { it.courseId == selectedCourseId }
+            val targetCourses = if (selectedCourseId.isEmpty()) courseList.filter { it.teacherId == myTeacherId } else courseList.filter { it.courseId == selectedCourseId }
             val enrolledSIds = enrollmentList
                 .filter { e -> targetCourses.any { it.courseId == e.courseId } }
                 .filter { selectedStudentId.isEmpty() || it.studentId == selectedStudentId }

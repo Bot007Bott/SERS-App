@@ -87,9 +87,30 @@ class UserManagementViewModel : ViewModel() {
 
     fun createUser(email: String, password: String, firstName: String, lastName: String,
                    username: String, role: String, profileId: String) {
-        auth.createUserWithEmailAndPassword(email, password)
+        val adminUser = auth.currentUser ?: return
+        val adminEmail = adminUser.email ?: return
+
+        // Create a secondary auth instance so admin session is not affected
+        val secondaryApp = try {
+            com.google.firebase.FirebaseApp.getInstance("secondary")
+        } catch (e: Exception) {
+            com.google.firebase.FirebaseApp.initializeApp(
+                com.google.firebase.FirebaseApp.getInstance().applicationContext,
+                com.google.firebase.FirebaseOptions.Builder()
+                    .setApiKey(com.google.firebase.FirebaseApp.getInstance().options.apiKey)
+                    .setApplicationId(com.google.firebase.FirebaseApp.getInstance().options.applicationId)
+                    .setProjectId(com.google.firebase.FirebaseApp.getInstance().options.projectId)
+                    .build(),
+                "secondary"
+            )
+        }
+
+        val secondaryAuth = com.google.firebase.auth.FirebaseAuth.getInstance(secondaryApp)
+
+        secondaryAuth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val uid = authResult.user?.uid ?: ""
+                secondaryAuth.signOut() // sign out from secondary, admin stays signed in
                 val newUser = hashMapOf(
                     "firstName" to firstName, "lastName" to lastName, "username" to username,
                     "email" to email, "role" to role, "uid" to uid,

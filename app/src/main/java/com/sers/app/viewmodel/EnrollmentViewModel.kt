@@ -71,6 +71,32 @@ class EnrollmentViewModel : ViewModel() {
     }
 
     fun enrollStudent(studentId: String, courseId: String) {
+        val allEnrollments = _enrollments.value ?: emptyList()
+        val allCourses = _courses.value ?: emptyList()
+
+        // Get the course being enrolled into
+        val newCourse = allCourses.find { it.courseId == courseId } ?: run {
+            enrollmentRepository.addEnrollment(studentId, courseId,
+                onSuccess = { _message.value = "Student enrolled!" },
+                onError = { e -> _message.value = "ERROR:$e" })
+            return
+        }
+
+        // Get all courses this student is already enrolled in
+        val enrolledCourseIds = allEnrollments
+            .filter { it.studentId == studentId }
+            .map { it.courseId }
+
+        val enrolledCourses = allCourses.filter { it.courseId in enrolledCourseIds }
+
+        // Check for schedule conflict — same day and overlapping time
+        val conflict = enrolledCourses.find { it.schedule == newCourse.schedule && it.courseId != courseId }
+
+        if (conflict != null) {
+            _message.value = "ERROR:Can't enroll — conflicts with ${conflict.courseName} (${conflict.schedule})"
+            return
+        }
+
         enrollmentRepository.addEnrollment(studentId, courseId,
             onSuccess = { _message.value = "Student enrolled!" },
             onError = { e -> _message.value = "ERROR:$e" }

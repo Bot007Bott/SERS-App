@@ -35,6 +35,8 @@ class TeacherGradesFragment : Fragment() {
     private var currentFilterCourseId = ""
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTeacherGradesBinding.inflate(inflater, container, false)
         return binding.root
@@ -55,19 +57,34 @@ class TeacherGradesFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.grades.observe(viewLifecycleOwner) { list -> fullGradeList.clear(); fullGradeList.addAll(list); updateUI() }
-        viewModel.students.observe(viewLifecycleOwner) { list -> studentList.clear(); studentList.addAll(list); adapter.setStudentsAndCourses(studentList, courseList) }
-        viewModel.courses.observe(viewLifecycleOwner) { list -> courseList.clear(); courseList.addAll(list); adapter.setStudentsAndCourses(studentList, courseList) }
-        viewModel.isLoading.observe(viewLifecycleOwner) { binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE }
-        viewModel.message.observe(viewLifecycleOwner) { if (it.isNotEmpty()) Snackbar.make(binding.root, it.removePrefix("ERROR:"), Snackbar.LENGTH_SHORT).show() }
+        viewModel.grades.observe(viewLifecycleOwner) { list ->
+            fullGradeList.clear(); fullGradeList.addAll(list); updateUI()
+        }
+        viewModel.students.observe(viewLifecycleOwner) { list ->
+            studentList.clear(); studentList.addAll(list)
+            adapter.setStudentsAndCourses(studentList, courseList)
+            updateUI()
+        }
+        viewModel.courses.observe(viewLifecycleOwner) { list ->
+            courseList.clear(); courseList.addAll(list)
+            adapter.setStudentsAndCourses(studentList, courseList)
+            updateUI()
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
+        }
+        viewModel.message.observe(viewLifecycleOwner) {
+            if (it.isNotEmpty()) Snackbar.make(binding.root, it.removePrefix("ERROR:"), Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateUI() {
         val query = binding.etSearch.text.toString()
         var list = fullGradeList.filter { g ->
+            if (query.isEmpty()) return@filter true
             val s = studentList.find { it.studentId == g.studentId }
             val c = courseList.find { it.courseId == g.courseId }
-            s?.firstName?.contains(query, true) == true || s?.lastName?.contains(query, true) == true || c?.courseName?.contains(query, true) == true
+            "${s?.firstName} ${s?.lastName}".contains(query, true) || c?.courseName?.contains(query, true) == true
         }
         if (currentFilterStudentId.isNotEmpty()) list = list.filter { it.studentId == currentFilterStudentId }
         if (currentFilterCourseId.isNotEmpty()) list = list.filter { it.courseId == currentFilterCourseId }
@@ -82,7 +99,22 @@ class TeacherGradesFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.btnSearch.setOnClickListener { toggleSearch() }
+        binding.btnSearch.setOnClickListener {
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
+            toggleSearch()
+        }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.searchLayout.visibility = View.GONE
+            binding.etSearch.setText("")
+            binding.btnSearch.setIconResource(R.drawable.ic_search)
+            binding.btnSearch.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            binding.btnSearch.setTextColor(android.graphics.Color.parseColor("#1976D2"))
+            binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
+            updateUI()
+        }
+
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) { updateUI() }
@@ -97,11 +129,17 @@ class TeacherGradesFragment : Fragment() {
         if (binding.searchLayout.visibility == View.GONE) {
             binding.searchLayout.visibility = View.VISIBLE
             binding.btnSearch.setIconResource(R.drawable.ic_close)
+            binding.btnSearch.setBackgroundColor(android.graphics.Color.parseColor("#1976D2"))
+            binding.btnSearch.setTextColor(android.graphics.Color.WHITE)
+            binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
         } else {
             binding.searchLayout.visibility = View.GONE
             binding.etSearch.setText("")
             updateUI()
             binding.btnSearch.setIconResource(R.drawable.ic_search)
+            binding.btnSearch.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            binding.btnSearch.setTextColor(android.graphics.Color.parseColor("#1976D2"))
+            binding.btnSearch.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1976D2"))
         }
     }
 
@@ -111,7 +149,7 @@ class TeacherGradesFragment : Fragment() {
             when (which) {
                 0 -> showStudentPicker()
                 1 -> showCoursePicker()
-                2 -> { currentFilterStudentId = ""; currentFilterCourseId = ""; updateUI() }
+                2 -> { currentFilterStudentId = ""; currentFilterCourseId = ""; updateUI(); updateFilterButtonUI() }
             }
         }.show()
     }
@@ -121,19 +159,19 @@ class TeacherGradesFragment : Fragment() {
         val myCIds = courseList.map { it.courseId }
         val sIds = enrolls.filter { it.courseId in myCIds }.map { it.studentId }.distinct()
         val opts = listOf("All Students" to "") + studentList.filter { it.studentId in sIds }.map { "${it.firstName} ${it.lastName} (${it.studentId})" to it.studentId }
-        showPickerSheet("Select Student", opts) { _, id -> currentFilterStudentId = id; updateUI() }
+        showPickerSheet("Select Student", opts) { _, id -> currentFilterStudentId = id; updateUI(); updateFilterButtonUI() }
     }
 
     private fun showCoursePicker() {
         val opts = listOf("All Courses" to "") + courseList.map { "${it.courseName} (${it.courseCode})" to it.courseId }
-        showPickerSheet("Select Course", opts) { _, id -> currentFilterCourseId = id; updateUI() }
+        showPickerSheet("Select Course", opts) { _, id -> currentFilterCourseId = id; updateUI(); updateFilterButtonUI() }
     }
 
     private fun showSortOptions() {
         val opts = arrayOf("Default", "Score High-Low", "Score Low-High")
         MaterialAlertDialogBuilder(requireContext()).setTitle("Sort by")
             .setSingleChoiceItems(opts, opts.indexOf(currentSortOrder)) { d, w ->
-                currentSortOrder = opts[w]; updateUI(); d.dismiss()
+                currentSortOrder = opts[w]; updateUI(); updateSortButtonUI(); d.dismiss()
             }.show()
     }
 
@@ -222,6 +260,22 @@ class TeacherGradesFragment : Fragment() {
 
         v.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun updateFilterButtonUI() {
+        val active = currentFilterStudentId.isNotEmpty() || currentFilterCourseId.isNotEmpty()
+        binding.btnFilter.text = if (active) "Filter •" else "Filter"
+        binding.btnFilter.setBackgroundColor(if (active) android.graphics.Color.parseColor("#1976D2") else android.graphics.Color.TRANSPARENT)
+        binding.btnFilter.setTextColor(if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
+        binding.btnFilter.iconTint = android.content.res.ColorStateList.valueOf(if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
+    }
+
+    private fun updateSortButtonUI() {
+        val active = currentSortOrder != "Default"
+        binding.btnSort.text = if (active) "Sort •" else "Sort"
+        binding.btnSort.setBackgroundColor(if (active) android.graphics.Color.parseColor("#1976D2") else android.graphics.Color.TRANSPARENT)
+        binding.btnSort.setTextColor(if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
+        binding.btnSort.iconTint = android.content.res.ColorStateList.valueOf(if (active) android.graphics.Color.WHITE else android.graphics.Color.parseColor("#1976D2"))
     }
 
     private fun showDeleteDialog(grade: Grade) {

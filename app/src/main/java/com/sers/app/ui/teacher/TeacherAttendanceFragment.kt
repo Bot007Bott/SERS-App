@@ -44,6 +44,8 @@ class TeacherAttendanceFragment : Fragment() {
     private var currentFilterStatus = "All"
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTeacherAttendanceBinding.inflate(inflater, container, false)
         return binding.root
@@ -76,16 +78,31 @@ class TeacherAttendanceFragment : Fragment() {
             enrollmentList.clear(); enrollmentList.addAll(enrollments)
         }
         viewModel.message.observe(viewLifecycleOwner) { msg ->
-            val text = if (msg.startsWith("ERROR:")) msg.removePrefix("ERROR:") else msg
-            Snackbar.make(binding.root, text, Snackbar.LENGTH_SHORT).show()
+            if (msg.isNotEmpty()) {
+                val text = if (msg.startsWith("ERROR:")) msg.removePrefix("ERROR:") else msg
+                Snackbar.make(binding.root, text, Snackbar.LENGTH_SHORT).show()
+            }
         }
 
         viewModel.loadAllData()
 
         binding.btnSearch.setOnClickListener {
-            val isVisible = binding.searchLayout.visibility == View.VISIBLE
-            binding.searchLayout.visibility = if (isVisible) View.GONE else View.VISIBLE
-            if (!isVisible) binding.etSearch.requestFocus()
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
+            if (binding.searchLayout.visibility == View.GONE) {
+                binding.searchLayout.visibility = View.VISIBLE
+                binding.etSearch.requestFocus()
+            } else {
+                binding.searchLayout.visibility = View.GONE
+                binding.etSearch.setText("")
+                refreshList()
+            }
+        }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.searchLayout.visibility = View.GONE
+            binding.etSearch.setText("")
+            refreshList()
         }
 
         binding.etSearch.addTextChangedListener(object : TextWatcher {

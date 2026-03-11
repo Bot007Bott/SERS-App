@@ -58,47 +58,35 @@
                         android:textColor="?android:textColorPrimary"
                         android:layout_marginBottom="12dp"/>
 
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFilterAll"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="8dp"
+                        android:text="All"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:cornerRadius="8dp"/>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnFilterAll"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            android:text="All"
-                            android:textSize="11sp"
-                            app:strokeColor="?attr/colorPrimary"
-                            app:cornerRadius="8dp"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFilterGrades"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Grades"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:cornerRadius="8dp"/>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnFilterGrades"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            android:text="Grades"
-                            android:textSize="11sp"
-                            app:strokeColor="?attr/colorPrimary"
-                            app:cornerRadius="8dp"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFilterAttendance"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Attendance"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:cornerRadius="8dp"/>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnFilterAttendance"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Attendance"
-                            android:textSize="11sp"
-                            app:strokeColor="?attr/colorPrimary"
-                            app:cornerRadius="8dp"/>
-
-                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

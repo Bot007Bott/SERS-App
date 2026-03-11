@@ -13,6 +13,13 @@ class EnrollmentCourseAdapter(
     private val onCourseClick: (Course) -> Unit
 ) : RecyclerView.Adapter<EnrollmentCourseAdapter.CourseViewHolder>() {
 
+    private var teachers: List<com.sers.app.model.Teacher> = emptyList()
+
+    fun setTeachers(list: List<com.sers.app.model.Teacher>) {
+        teachers = list
+        notifyDataSetChanged()
+    }
+
     inner class CourseViewHolder(private val binding: ItemEnrollmentCourseBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -20,6 +27,9 @@ class EnrollmentCourseAdapter(
             binding.tvCourseName.text = course.courseName
             binding.tvCourseCode.text = course.courseCode
             binding.tvSchedule.text = course.schedule
+
+            val teacher = teachers.find { it.teacherId == course.teacherId }
+            binding.tvTeacherName.text = if (teacher != null) "👤 ${teacher.firstName} ${teacher.lastName}" else "No teacher assigned"
 
             val count = enrollments.count { it.courseId == course.courseId }
             binding.tvStudentCount.text = "$count student${if (count != 1) "s" else ""}"

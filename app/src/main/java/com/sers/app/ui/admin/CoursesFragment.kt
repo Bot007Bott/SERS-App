@@ -247,7 +247,7 @@ class CoursesFragment : Fragment() {
 
         // Teacher picker — bottom sheet with search
         btnSelectTeacher.setOnClickListener {
-            val opts = listOf("No Teacher" to "") + teacherList.map { "${it.firstName} ${it.lastName} (${it.teacherId})" to it.teacherId }
+            val opts = listOf("No Teacher" to "") + teacherList.map { "${it.firstName} ${it.lastName} — ${it.department} (${it.teacherId})" to it.teacherId }
             showPickerSheet("Assign Teacher", opts) { _, id ->
                 selectedTeacherId = id
                 if (id.isEmpty()) {
@@ -317,7 +317,7 @@ class CoursesFragment : Fragment() {
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
                 val opt = filteredOptions[pos]
                 (holder as VH).b.tvOption.text = opt.first
-                holder.b.ivCheck.visibility = View.GONE
+                holder.b.ivCheck.visibility = if (opt.second == currentFilter) View.VISIBLE else View.GONE
                 holder.b.root.setOnClickListener { onSelect(opt.first, opt.second); bottomSheet.dismiss() }
             }
             override fun getItemCount() = filteredOptions.size

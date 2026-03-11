@@ -32,6 +32,8 @@ class GradesFragment : Fragment() {
     private var selectedFilterCourseId = ""
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentGradesBinding.inflate(inflater, container, false)
         return binding.root
@@ -79,10 +81,24 @@ class GradesFragment : Fragment() {
 
     private fun setupSearch() {
         binding.btnSearch.setOnClickListener {
-            val isVisible = binding.searchLayout.visibility == View.VISIBLE
-            binding.searchLayout.visibility = if (isVisible) View.GONE else View.VISIBLE
-            if (!isVisible) binding.etSearch.requestFocus()
+            if (isClosingFromX) { isClosingFromX = false; return@setOnClickListener }
+            if (binding.searchLayout.visibility == View.GONE) {
+                binding.searchLayout.visibility = View.VISIBLE
+                binding.etSearch.requestFocus()
+            } else {
+                binding.etSearch.setText("")
+                binding.searchLayout.visibility = View.GONE
+                refreshList()
+            }
         }
+
+        binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
+            binding.etSearch.setText("")
+            binding.searchLayout.visibility = View.GONE
+            refreshList()
+        }
+
         binding.etSearch.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { refreshList() }
@@ -264,6 +280,13 @@ class GradesFragment : Fragment() {
         var filteredOptions = allOptions.toMutableList()
         val rv = sheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvFilterOptions)
         rv.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+
+        val currentFilterValue = when {
+            title.contains("Student", ignoreCase = true) -> selectedFilterStudentId
+            title.contains("Course", ignoreCase = true) -> selectedFilterCourseId
+            else -> ""
+        }
+
         val adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
             inner class VH(val b: com.sers.app.databinding.ItemFilterOptionBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(b.root)
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
@@ -271,7 +294,8 @@ class GradesFragment : Fragment() {
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
                 val opt = filteredOptions[pos]
                 (holder as VH).b.tvOption.text = opt.first
-                holder.b.ivCheck.visibility = View.GONE
+                // Show checkmark if this option matches the current filter
+                holder.b.ivCheck.visibility = if (opt.second == currentFilterValue) View.VISIBLE else View.GONE
                 holder.b.root.setOnClickListener { onSelect(opt.first, opt.second); bottomSheet.dismiss() }
             }
             override fun getItemCount() = filteredOptions.size

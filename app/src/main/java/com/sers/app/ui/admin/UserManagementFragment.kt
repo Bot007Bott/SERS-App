@@ -39,6 +39,8 @@ class UserManagementFragment : Fragment() {
     private var currentFilterRole = "All"
     private var currentSortOrder = "Default"
 
+    private var isClosingFromX = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentUserManagementBinding.inflate(inflater, container, false)
         return binding.root
@@ -116,6 +118,7 @@ class UserManagementFragment : Fragment() {
         })
 
         binding.searchLayout.setEndIconOnClickListener {
+            isClosingFromX = true
             binding.etSearch.setText("")
             binding.searchLayout.visibility = View.GONE
             binding.btnSearch.setBackgroundColor(android.graphics.Color.TRANSPARENT)

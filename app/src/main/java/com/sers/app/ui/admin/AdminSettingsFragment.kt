@@ -67,6 +67,7 @@ class AdminSettingsFragment : Fragment() {
         viewModel.loadCurrentUser()
 
         // Dark mode toggle
+        binding.switchDarkMode.setOnCheckedChangeListener(null)
         binding.switchDarkMode.isChecked = ThemeHelper.isDarkModeEnabled(requireContext())
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
             ThemeHelper.setDarkMode(requireContext(), isChecked)

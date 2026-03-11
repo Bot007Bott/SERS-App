@@ -95,6 +95,9 @@ class TeacherManagementFragment : Fragment() {
                     binding.btnFilter.setTextColor(
                         if (currentFilter.isEmpty()) android.graphics.Color.parseColor("#1976D2")
                         else android.graphics.Color.WHITE)
+                    binding.btnFilter.iconTint = android.content.res.ColorStateList.valueOf(
+                        if (currentFilter.isEmpty()) android.graphics.Color.parseColor("#1976D2")
+                        else android.graphics.Color.WHITE)
                     dialog.dismiss()
                 }
                 .show()
@@ -228,7 +231,7 @@ class TeacherManagementFragment : Fragment() {
             }
 
             if (isEdit) {
-                viewModel.updateTeacher(teacher!!.docId, firstName, lastName, email, phone, department)
+                viewModel.updateTeacher(teacher!!.docId, firstName, lastName, email, department, phone)
             } else {
                 val newId = "TCH${String.format("%03d", (viewModel.teachers.value?.size ?: 0) + 1)}"
                 val newTeacher = Teacher(teacherId = newId, firstName = firstName, lastName = lastName, email = email, phone = phone, department = department, docId = "")
